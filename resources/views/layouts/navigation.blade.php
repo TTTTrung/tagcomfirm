@@ -31,11 +31,13 @@
                         {{ __('ListPlan') }}
                     </x-nav-link>
                 </div>
+                @role(['superAdmin'])
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('createuser')" :active="request()->routeIs('createuser')">
                         {{ __('CreateUser') }}
                     </x-nav-link>
                 </div>
+                @endrole                
             </div>
 
             <!-- Settings Dropdown -->
