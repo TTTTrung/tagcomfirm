@@ -245,7 +245,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
             
             public function headings(): array
             {
-                return ["ลำดับที่","ชนิดของ","ปริมาณ","SNP","น้ำหนัก","น้ำหนักรวม","จำนวนหีบห่อ","ราคา/หน่วย","ราคารวม"];
+                return ["ลำดับที่","ชนิดของ","ปริมาณ","SNP","น้ำหนัก","น้ำหนักรวม","จำนวนหีบห่อ","ราคา/หน่วย","ราคารวม","REMARK"];
             }
             public function styles(Worksheet $sheet)
             {
@@ -280,8 +280,8 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     ],
                 ];
                  
-                $sheet->getStyle('A6:I6')->applyFromArray($styleArray);
-                $sheet->getStyle('A7:I7')->applyFromArray($styleBottomArray);
+                $sheet->getStyle('A6:J6')->applyFromArray($styleArray);
+                $sheet->getStyle('A7:J7')->applyFromArray($styleBottomArray);
                 $sheet->getStyle('A6:A7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('B6:B7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('C6:C7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
@@ -290,7 +290,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getStyle('F6:F7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('G6:G7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('H6:H7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
-                $sheet->getStyle('A7:I7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A7:J7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getRowDimension('6')->setRowHeight(20);
                 $sheet->getColumnDimension('A')->setWidth(8);
                 $sheet->getColumnDimension('B')->setWidth(20);
@@ -301,6 +301,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getColumnDimension('G')->setWidth(15);
                 $sheet->getColumnDimension('H')->setWidth(15);
                 $sheet->getColumnDimension('I')->setWidth(15);
+                $sheet->getColumnDimension('J')->setWidth(15);
 
 
                 $sheet->getStyle(6)->getFont()->setBold(true);
@@ -326,7 +327,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->setCellValue("H{$currentrow}", $outpart->total_price / $outpart->total_quantity ?? null);
                 $sheet->setCellValue("I{$currentrow}", $outpart->total_price ?? null);
 
-                for ($col = 'A'; $col <= 'I'; $col++) {
+                for ($col = 'A'; $col <= 'J'; $col++) {
                     $sheet->getStyle("{$col}{$currentrow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("{$col}{$currentrow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                     $sheet->getStyle("{$col}{$currentrow}")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_DASHED);
