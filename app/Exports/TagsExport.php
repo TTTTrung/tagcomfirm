@@ -64,7 +64,7 @@ class TagsExport implements WithCustomStartCell, WithStyles ,WithEvents
 
 
             $sheet->mergeCells("A{$count}:D{$count}");
-            $sheet->setCellValue("A{$count}", 'KMT Production Parts Receiving Tag');
+            $sheet->setCellValue("A{$count}", "THAI RUNG UNION CAR PUBLIC CO. TRU");
             $sheet->setCellValue("A".($count +1),'P/O NO.');
             $sheet->mergeCells("B".($count + 1).":D".($count + 1));
             $sheet->setCellValue("B".($count + 1), $tt->issue);
@@ -73,7 +73,7 @@ class TagsExport implements WithCustomStartCell, WithStyles ,WithEvents
             $sheet->setCellValue("A".($count + 2),'Part Name');
             $sheet->mergeCells("B".($count + 2).":D".($count + 2));
             $partname = Part::where('outpart',$tt->outpart)->first();
-            $sheet->setCellValue("B".($count + 2), $partname->partname);
+            $sheet->setCellValue("B".($count + 2), $partname->partname ?? null);
 
             $sheet->setCellValue("A".($count + 3),'Vendor');
             $sheet->mergeCells("B".($count + 3).":E".($count + 3));
@@ -92,7 +92,7 @@ class TagsExport implements WithCustomStartCell, WithStyles ,WithEvents
             $sheet->getStyle("B".($count + 6))->getFont()->setSize(16);
         
             $sheet->mergeCells("E{$count}:H".($count+2));
-            $sheet->setCellValue("E".($count),"*{$partname->trupart}*");
+            $sheet->setCellValue("E".($count),"*{$partname->trupart}*" );
             $sheet->getStyle("E".($count))->getFont()->setName('IDAutomationHC39M Free Version');
             $sheet->getStyle("E".($count))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("E".($count))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
@@ -101,49 +101,6 @@ class TagsExport implements WithCustomStartCell, WithStyles ,WithEvents
         }
     }
 
-    // public function drawings()
-    // {
-    //     $left = true;
-    //     $count = 1;
-    //     foreach ($this->test as $tt) {
-    //     if($left){
-    //         $barcode = new DNS1D();
-    //         $trupart=Part::where('outpart',$tt->outpart)->first();
-    //         $barcodeImage = $barcode->getBarcodePNG($trupart->trupart,'C128');
-
-    //         $tempBarcodePath = tempnam(sys_get_temp_dir(), 'barcode_');
-    //         file_put_contents($tempBarcodePath, $barcodeImage);
-
-    //         $drawing = new Drawing();
-    //         $drawing->setName('Barcode');
-    //         $drawing->setDescription('Barcode');
-    //         $drawing->setPath($tempBarcodePath); // Set the path to the temporary barcode image file
-    //         $drawing->setCoordinates("A" . ($count + 9));
-    //         $drawing->setHeight(50);
-    //         $drawing->setWidth(200);
-
-    //         // Add the drawing to the worksheet
-    //         // $sheet->addDrawing($drawing);
-
-    //         // Remove the temporary barcode image file
-    //         unlink($tempBarcodePath);
-    //     }
-    //     else{
-    //         $barcode = new DNS1D();
-    //         $barcode->setStorPath(__DIR__ . '/cache/');
-    //         $trupart=Part::where('outpart',$tt->outpart)->first();
-    //         $barcodeImage = $barcode->getBarcodePNG($trupart->trupart,'C128');
-
-    //         $drawing = new Drawing();
-    //         $drawing->setname('Barcode');
-    //         $drawing->setDescription('Barcode');
-    //         $drawing->setPath($barcodeImage);
-    //         $drawing->setCoordinates("J".($count + 9));
-
-
-    //     }
-    //     }
-    // }
     public function registerEvents(): array
     {
         return [

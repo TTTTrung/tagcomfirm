@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Plandue extends Model
 {
     use HasFactory;
-    protected $fillable = ['plan_id', 'status', 'created_by'];
+    protected $fillable = ['plan_id', 'status', 'created_by','company_name'];
 
     public function createBy():BelongsTo
     {
@@ -22,7 +22,7 @@ class Plandue extends Model
         return $this->hasMany(Listitem::class);
     }
 
-    public function scopeSearchpland($query, $value){
+    public function scopeSearchPland($query, $value){
         $query->where('plan_id','like',"%{$value}%")
         ->orWhereHas('listitems' ,function($query) use ($value){
             $query->where('issue','like',"%{$value}%");

@@ -27,6 +27,7 @@
                                     <div class="flex">
                                         <h2 class="w-8 h-8 bg-sky-300 text-white flex justify-center items-center rounded-sm mr-3">{{ $index + 1 }}</h2>
                                         <h3>{{ $pland->plan_id}}</h3>
+                                        <h3 class="ml-1">{{ $pland->company_name }}</h3>
                                     </div>
                                     <div>
                                         <button wire:click.stop="openApproveModal({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
@@ -60,6 +61,9 @@
                                                 </th>
                                                 <th scope="col" class="px-6 py-3">
                                                     Quantity 
+                                                </th> 
+                                                <th scope="col" class="px-6 py-3">
+                                                    Price 
                                                 </th>                                            
                                             </tr>
                                         </thead>
@@ -80,6 +84,9 @@
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     {{$listitem->quantity }}
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    {{$listitem->prize }}
                                                 </td>
                                                 {{-- <td class="px-6 py-4">
                                                     {{ optional($part->createdBy)->name }}
@@ -126,6 +133,7 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3">Due Date</th>
+                            <th scope="col" class="px-6 py-3">Customer Id.</th>
                             <th scope="col" class="px-6 py-3">Issue No.</th>
                             <th scope="col" class="px-6 py-3">Outside part No.</th>
                             <th scope="col" class="px-6 py-3">Quantity</th>
@@ -137,6 +145,11 @@
                         <tr>
                             <td class="px-6" >
                                 @error('itemDetails.' . $rowIndex . '.duedate') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
+                            <td class="px-6" >
+                                @error('itemDetails.' . $rowIndex . '.customer') 
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
                             </td>
@@ -161,6 +174,10 @@
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="itemDetails.{{ $rowIndex }}.duedate" type="date" class="w-full p-2 border border-gray-300 rounded" required />
                                     </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.customer" type="text" class="w-full p-2 border border-gray-300 rounded"  />
+                                    </td>
+                                   
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="itemDetails.{{ $rowIndex }}.issue" type="text" class="w-full p-2 border border-gray-300 rounded"  />
                                     </td>

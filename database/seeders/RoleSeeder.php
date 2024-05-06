@@ -13,9 +13,16 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $role = Role::create(['name' => 'scanner']);
-        $role = Role::create(['name' => 'commoner']);
-        $role = Role::create(['name' => 'plAdmin']);
-        $role = Role::create(['name' => 'superAdmin']);
+        $roles = ['scanner', 'commoner', 'plAdmin', 'plSuperAdmin', 'superAdmin'];
+
+        foreach ($roles as $roleName) {
+        // Check if a role with the current name already exists
+        $existingRole = Role::where('name', $roleName)->first();
+
+        // If the role doesn't exist, create it
+        if (!$existingRole) {
+            Role::create(['name' => $roleName]);
+        }
+    }
     }
 }

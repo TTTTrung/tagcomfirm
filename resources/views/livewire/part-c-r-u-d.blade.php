@@ -3,7 +3,7 @@
         <div class="mx-auto sm:px-6 lg:px-8" :style="{'max-width' : '90rem' }">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto p-6 text-gray-900">
-                    <div class="pb-4 bg-white  flex justify-between">
+                    <div class="pb-4 bg-white  flex justify-between items-center">
                         <label for="table-search" class="sr-only">Search</label>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -11,17 +11,34 @@
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                                 </svg>
                             </div>
-                            <input type="text"  class="block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for items">
+                            <input type="text" wire:model.live="search" class="block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for items">
                         </div>
-                        <button type="button" wire:click="openCreateModal"  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none ">
+                        <div class="flex space-x-1">
+                        <div class="flex space-x-1 items-center">
+                            <label class="w-40 text-sm font-medium text-gray-900"></label>
+                            <select wire:model.live="company"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                <option value="">All</option>
+                                @foreach ($com_id as $company)
+                                <option value="{{ $company }}">{{ $company }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @role(['plSuperAdmin','superAdmin'])
+                        <button type="button" wire:click="openCreateModal"  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none ">
                             Create
-                        </button>
+                        </button>   
+                        @endrole
+                        </div>
                     </div>
                     <table class="m-6 w-full text-sm text-left rtl:text-right text-gray-500 ">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" class="px-6 py-3">
                                     No.
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Customer Id.
                                 </th>
                                 <th scope="col" class="px-6 py-3">
                                     Type.
@@ -41,12 +58,12 @@
                                 <th scope="col" class="px-6 py-3">
                                     Weight
                                 </th>
-                                <th scope="col" class="px-6 py-3">
+                                {{-- <th scope="col" class="px-6 py-3">
                                     Created by
                                 </th>
                                 <th scope="col" class="px-6 py-3">
                                     Updated by
-                                </th>
+                                </th> --}}
                                 <th scope="col" class="px-6 py-3">
                                     Action
                                 </th>
@@ -57,6 +74,9 @@
                             <tr class="bg-white border-b hover:bg-gray-50">
                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
                                     {{ $loop->iteration }}
+                                </th>
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                    {{ $part->customer}}
                                 </th>
                                 
                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -77,15 +97,19 @@
                                 <td class="px-6 py-4">
                                     {{$part->weight }}
                                 </td>
-                                <td class="px-6 py-4">
+                                {{-- <td class="px-6 py-4">
                                     {{ optional($part->createdBy)->name }}
                                 </td>
                                 <td class="px-6 py-4">
                                     {{ optional($part->updatedBy)->name }}
-                                </td>
+                                </td> --}}
                                 <td class="px-6 py-4">
+                                    @role(['plSuperAdmin','superAdmin'])
                                     <button wire:click="openEditModal({{ $part->id }})"  class="font-medium text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-red-300 px-2 py-0.5">Edit</button>
+                                    @else
+                                    You cant edit.
                                     {{-- <button  class="font-medium text-white rounded-lg bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 px-2 py-0.5">Delete</button> --}}
+                                    @endrole
                                 </td>
                             </tr>   
                             @endforeach 
@@ -102,7 +126,7 @@
     {{-- createpart modal  --}}
     @if($showCreateModal)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="hideCreateModal"></div>
-    <form class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '700px', 'max-width' : '35rem' }" wire:submit.prevent="addPart">
+    <form class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '780px', 'max-width' : '35rem' }" wire:submit.prevent="addPart">
         <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Create Part</div>
             <button wire:click="hideCreateModal" class="focus:outline-none">
@@ -115,6 +139,13 @@
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
             <!-- Form Content -->
             <div class="w-full">
+                <div class="mb-5 mt-5 mx-10">
+                    <label for="customer" class="block mb-2 text-sm font-medium text-gray-900 ">Customer Id</label>
+                    <input id="customer" wire:model="customer" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                    @error('customer') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror
+                </div>
                 
                 <div class="mb-5 mt-5 mx-10">
                     <label for="typee" class="block mb-2 text-sm font-medium text-gray-900 ">Type</label>
@@ -169,7 +200,7 @@
 {{-- editmodal --}}
 @if($showEditModal)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="hideEditModal"></div>
-    <form class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '700px', 'max-width' : '35rem' }" wire:submit.prevent="editPart">
+    <form class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '780px', 'max-width' : '35rem' }" wire:submit.prevent="editPart">
         <div class="bg-yellow-400 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Edit Part</div>
             <button wire:click="hideEditModal" class="focus:outline-none">
@@ -182,6 +213,14 @@
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
             <!-- Form Content -->
             <div class="w-full">
+
+                <div class="mb-5 mt-5 mx-10">
+                    <label for="evendor" class="block mb-2 text-sm font-medium text-gray-900">Vendor</label>
+                    <input id="evendor" wire:model="evendor" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                    @error('etypee') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror
+                </div>
                 
                 <div class="mb-5 mt-5 mx-10">
                     <label for="etypee" class="block mb-2 text-sm font-medium text-gray-900">Type</label>
@@ -228,7 +267,7 @@
                 </div>
         </div>
     <div class="bg-gray-100 w-full flex justify-end p-4">
-        <button type="submit" class="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Add part</button>
+        <button type="submit" class="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
     </div>
     </form>
 </div>

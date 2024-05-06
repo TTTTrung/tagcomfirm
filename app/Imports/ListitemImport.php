@@ -14,9 +14,10 @@ class ListitemImport implements ToCollection
     {         
            return [
                 'duedate' => $rows[0],
-                'issue' => $rows[1],
-                'outpart' => $rows[2],
-                'quantity' => $rows[3],
+                'customer' => $rows[1],
+                'issue' => $rows[2],
+                'outpart' => $rows[3],
+                'quantity' => $rows[4],
            ];        
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Part extends Model
 {
     use HasFactory;
-    protected $fillable = ['type','partname','outpart','trupart','snp','weight','created_by','updated_by'];
+    protected $fillable = ['customer','type','partname','outpart','trupart','snp','weight','created_by','updated_by'];
 
     public function createdBy()
     {
@@ -19,5 +19,13 @@ class Part extends Model
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function scopeSearchPart($query, $value)
+    {
+        $query->where('type','like',"%{$value}%")
+            ->orWhere('partname','like',"%{$value}%")
+            ->orWhere('outpart','like',"%{$value}%")
+            ->orWhere('trupart','like',"%{$value}%");
     }
 }

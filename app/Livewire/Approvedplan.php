@@ -2,9 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Exports\ExportMultipleSheetPlan;
 use App\Exports\PlandueExport;
+use App\Exports\ShortPlanExport;
 use App\Exports\TagsExport;
+use App\Models\Listitem;
 use App\Models\Plandue;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -18,43 +22,73 @@ class Approvedplan extends Component
     #[Url(history:true)]
     public $search = "";
 
-    #[Url(history:true)]
     public $mydata = "";
+
+    #[Url(history:true)]
+    public $company = "";
+    
     
     public function export($id) 
     {
         $exportplan = Plandue::where('id', $id)->with('listitems')->with('createBy')->first();
+        if (!$exportplan) {
+                    return response()->json(['error' => 'Plandue not found'], 404);
+                }
         $test = $exportplan->listitems;
         $test2 = $exportplan->createBy;
-        // dd($test2);
-        if (!$exportplan) {
-            return response()->json(['error' => 'Plandue not found'], 404);
-        }
-        // download(new PlandueExport($exportplan,$test,$test2), 'plandue.xlsx')
-        return Excel::download(new TagsExport($exportplan, $test, $test2),'tag.xlsx');
+        $sumvalue = Listitem::select('outpart', 'customer', DB::raw('SUM(quantity) as total_quantity'),DB::raw('SUM(prize) as total_price'))
+        ->where('plandue_id', $id)
+        ->groupBy('outpart', 'customer') // Include customer in the group by clause
+        ->get();
+        
+        return Excel::download(new ExportMultipleSheetPlan($exportplan, $test, $test2,$sumvalue),'tag.xlsx');
+
     }
 
-    public function export2($id)
-    {
-        $exportplan = Plandue::where('id', $id)->with('listitems')->with('createBy')->first();
-        $test = $exportplan->listitems;
-        $test2 = $exportplan->createBy;
-        if (!$exportplan) {
-            return response()->json(['error' => 'Plandue not found'], 404);
-        }
-        return Excel::download(new PlandueExport($exportplan,$test,$test2), 'plandue.xlsx');
-    }
+    // public function export2($id)
+    // {
+    //     $exportplan = Plandue::where('id', $id)->with('listitems')->with('createBy')->first();
+    //     $test = $exportplan->listitems;
+    //     $test2 = $exportplan->createBy;
+    //     if (!$exportplan) {
+    //         return response()->json(['error' => 'Plandue not found'], 404);
+    //     }
+    //     return Excel::download(new PlandueExport($exportplan,$test,$test2), 'plandue.xlsx');
+    // }
+
+    // public function export3($id)
+    // {
+    //     $exportplan = Plandue::where('id', $id)->with('listitems')->with('createBy')->first();
+    //     $test = $exportplan->listitems;
+    //     $test2 = $exportplan->createBy;
+    //     $sumvalue = Listitem::select('outpart', 'customer', DB::raw('SUM(quantity) as total_quantity'),DB::raw('SUM(prize) as total_price'))
+    //     ->where('plandue_id', $id)
+    //     ->groupBy('outpart', 'customer') // Include customer in the group by clause
+    //     ->get();
+
+
+    //     if (!$exportplan) {
+    //         return response()->json(['error' => 'Plandue not found'], 404);
+    //     }
+    //     return Excel::download(new ShortPlanExport($exportplan,$test,$test2,$sumvalue), 'plandue.xlsx');
+    // }
 
 
     public function render()
     {
+        $get_com = Plandue::whereNotNull('company_name')->distinct()->pluck('company_name');
         $plands = Plandue::where('status','approved')
-        ->with('listitems')->when($this->mydata !== "", function($query){
+        ->with('listitems')
+        ->when($this->mydata !== "", function($query){
             $query->where('created_by',auth()->id());
         })
+        ->when($this->company !== "" , function($query){
+            $query->where('company_name',$this->company);
+        })
             ->searchpland($this->search)
+            ->orderBy('id','desc')
             ->paginate(10);
 
-        return view('livewire.approvedplan',compact('plands'));
+        return view('livewire.approvedplan',compact('plands','get_com'));
     }
 }

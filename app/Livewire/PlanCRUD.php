@@ -8,18 +8,19 @@ use App\Models\Part;
 use App\Models\Plandue;
 use App\Rules\ExceedsLimit;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
-
+use PDOException;
 
 class PlanCRUD extends Component
 {
     use WithFileUploads;
     public $showCreateModal = false;
     public $itemDetails = [
-        ['duedate' => '', 'issue' => '', 'outpart' => '', 'quantity' => ''],
+        ['duedate' => '','customer'=>'', 'issue' => '', 'outpart' => '', 'quantity' => ''],
     ];
     public $getOutpartSuggestions;
 
@@ -33,7 +34,7 @@ class PlanCRUD extends Component
     public function processCsv()
     {
         $this->validate([
-            'csvFile' => ['required','mimes:csv'],
+            'csvFile' => ['required','mimes:csv,xlsx'],
         ]);
 
         $data = Excel::toArray(new ListitemImport, $this->csvFile);
@@ -44,13 +45,15 @@ class PlanCRUD extends Component
         foreach ($data[0] as $row) {
         if($row[0] !== 'duedate'){     
             $duedate = $row[0];
-            $issue = $row[1];
-            $outpart = $row[2];
-            $quantity = $row[3];
+            $customer = $row[1];
+            $issue = $row[2];
+            $outpart = $row[3];
+            $quantity = $row[4];
         
             
             $itemDetails = [
                 'duedate' => $duedate,
+                'customer' => $customer,
                 'issue' => $issue,
                 'outpart' => $outpart,
                 'quantity' => $quantity,
@@ -99,7 +102,7 @@ class PlanCRUD extends Component
 
     public function addItem()
     {
-        $this->itemDetails[] = ['duedate' => '', 'issue' => '', 'outpart' => '', 'quantity' => ''];
+        $this->itemDetails[] = ['duedate' => '','customer'=>'', 'issue' => '', 'outpart' => '', 'quantity' => ''];
     }
 
     public function clearItem()
@@ -119,13 +122,16 @@ class PlanCRUD extends Component
 {
     $this->validate([
         'itemDetails.*.duedate' => 'required|date',
+        'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
         'itemDetails.*.issue' => 'string',
-        'itemDetails.*.outpart' => ['required','string',Rule::exists('parts','outpart')],
+        'itemDetails.*.outpart' => ['required',Rule::exists('parts','outpart')],
         'itemDetails.*.quantity' => 'required|numeric',
     ],
     [
         'itemDetails.*.duedate.required' => 'DueDate is required.',
         'itemDetails.*.duedate.date' => 'Date must be a valid date.',
+        'itemDetails.*.customer.required' => 'Customer is required.',
+        'itemDetails.*.customer.required' => 'Customer does not exist.',        
         'itemDetails.*.outpart.required' => 'Outpart field is required.',
         'itemDetails.*.outpart.exists' => 'Outpart does not exist.',
         'itemDetails.*.quantity.required' => 'Quantity field is required.',
@@ -136,13 +142,13 @@ class PlanCRUD extends Component
         $currentDate = Carbon::now()->format('Ymd');
         $searchPattern = "IS-{$currentDate}-";
 
-        foreach($this->itemDetails as $index => $checkIssue) {
+        foreach($this->itemDetails as $checkIssue) {
             if (empty($checkIssue['issue'])) {
                 $latestIssue = Listitem::latest()->where('issue', 'LIKE', "%{$searchPattern}%")->first();
                 $countIssue = $latestIssue ? (int) substr($latestIssue->issue, -4) + 1 : 1;
                 $issueCounterFormatted = sprintf('%04d', $countIssue);
                 $customIssue = "IS-{$currentDate}-{$issueCounterFormatted}";
-                $this->itemDetails[$index]['issue'] = $customIssue;
+                $this->itemDetails[0]['issue'] = $customIssue;
                 $latestNumber = 0;
             }
             else
@@ -155,7 +161,7 @@ class PlanCRUD extends Component
 
             if (!empty($checkIssue['outpart'])) {
               
-                $maxQuantity = Part::where('outpart',$checkIssue['outpart'])->first();
+                $maxQuantity = Part::where('customer', $checkIssue['customer'])->where('outpart',$checkIssue['outpart'])->first();
                 $snp = $maxQuantity->snp ?? null;
                 
                 if ($snp && $checkIssue['quantity'] > $snp) {
@@ -164,18 +170,26 @@ class PlanCRUD extends Component
                         $count = $latestNumber + $i;
                         $quantityToAdd = min($checkIssue['quantity'], $snp);
                         $this->itemDetails[] = [
-                            'duedate' => $this->itemDetails[$index]['duedate'],
-                            'issue' => "{$count}-{$this->itemDetails[$index]['issue']}",
-                            'outpart' => $this->itemDetails[$index]['outpart'],
+                            'duedate' => $this->itemDetails[0]['duedate'],
+                            'customer' => $this->itemDetails[0]['customer'],
+                            'issue' => "{$count}-{$this->itemDetails[0]['issue']}",
+                            'outpart' => $this->itemDetails[0]['outpart'],
                             'quantity' => $quantityToAdd,
                         ];
                         $checkIssue['quantity'] -= $quantityToAdd;
                     }
-                    array_splice($this->itemDetails, $index, 1);
+                    array_splice($this->itemDetails, 0, 1);
                 }
                 else
                 {
-                    
+                    $this->itemDetails[] = [
+                        'duedate' => $this->itemDetails[0]['duedate'],
+                        'customer' => $this->itemDetails[0]['customer'],
+                        'issue' => $latestIssue > 0 ? ($latestIssue + 1) . "-{$this->itemDetails[0]['issue']}" : $this->itemDetails[0]['issue'],
+                        'outpart' => $this->itemDetails[0]['outpart'],
+                        'quantity' => $this->itemDetails[0]['quantity'],
+                    ];
+                    array_splice($this->itemDetails, 0, 1);
                 }
             }
         }
@@ -196,21 +210,28 @@ class PlanCRUD extends Component
         } 
         else {
         
-
             $this->validate([
                 'itemDetails.*.duedate' => 'required|date',
+                'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
                 'itemDetails.*.issue' => 'required|string|unique:listitems,issue',
-                'itemDetails.*.outpart' => ['required','string',Rule::exists('parts','outpart')],
+                'itemDetails.*.outpart' => ['required','string',
+                function ($attribute, $value, $fail){
+                    $index = explode('.', $attribute)[1];
+                    $customer = $this->itemDetails[$index]['customer'];
+                    $outpart = $this->itemDetails[$index]['outpart'];
+        
+                    // Check if the combination of customer and outpart exists in the parts table
+                    if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
+                        $fail("The outpart '$outpart' does not exist for customer '$customer'.");
+                    }
+                }
+                ],
                 'itemDetails.*.quantity' =>
                 ['required', 'numeric', 
                 function ($attribute, $value, $fail) {
                     
                     $index = explode('.', $attribute)[1];
                     $outpart = $this->itemDetails[$index]['outpart'] ?? null;
-                    // if (!$outpart) {
-                    //     $fail("The outpart for index $index is missing.");
-                    //     return;
-                    // }
                     $limit = Part::where('outpart', $outpart)->value('snp');
                       if(is_null($limit)){
                         $fail("");
@@ -231,20 +252,123 @@ class PlanCRUD extends Component
                 'itemDetails.*.quantity.numeric' => 'Quantity must be numeric.',
                 'itemDetails.*.quantity.exceeds_limit' => 'The quantity exceeds the maximum limit for the outpart.',
             ]);
-
+        try{
+           $customer =  DB::connection('oracle')
+            ->select("SELECT 
+            hca.account_number AS CUSTOMER_NUMBER,
+            hp.party_name AS CUSTOMER_NAME,
+            hcsu.price_list_id
+        FROM 
+            AR.hz_parties hp
+        JOIN 
+            AR.hz_cust_accounts hca ON hp.party_id = hca.party_id
+        LEFT JOIN 
+            AR.hz_cust_acct_sites_all hcas ON hca.cust_account_id = hcas.cust_account_id
+        LEFT JOIN 
+            AR.hz_party_sites hps ON hps.party_site_id = hcas.party_site_id
+        LEFT JOIN 
+            AR.hz_cust_site_uses_all hcsu ON hcas.cust_acct_site_id = hcsu.cust_acct_site_id
+        LEFT JOIN 
+            AR.hz_locations hl ON hps.location_id = hl.location_id
+        JOIN 
+            APPS.hr_operating_units hou ON hcas.org_id = hou.organization_id
+        WHERE 
+            hp.party_type = 'ORGANIZATION' 
+            AND hp.status = 'A' 
+            AND hps.status = 'A' 
+            AND hcas.org_id = 84 
+            AND hcsu.site_use_code = 'BILL_TO' 
+            AND hca.account_number = '{$this->itemDetails[0]['customer']}'
+        ORDER BY 
+            hp.party_name, hca.account_number") ?? null;
+        }catch (PDOException $e)
+        {
+            $customer = null;
+        }
+        
             $plan = Plandue::create([
                 'plan_id' => $customId,
                 'status' => 'pending',
+                'company_name' => $customer[0]->customer_name ?? null,
                 'created_by' => auth()->id(),
             ]);
 
             foreach ($this->itemDetails as $item) {
+                $trupart = Part::where('customer',$item['customer'])->where('outpart',$item['outpart'])->first();
+    
+                try{
+                $price_list = DB::connection('oracle')
+                    ->select("SELECT 
+                    hca.account_number AS CUSTOMER_NUMBER,
+                    hp.party_name AS CUSTOMER_NAME,
+                    hcsu.price_list_id
+                FROM 
+                    AR.hz_parties hp
+                JOIN 
+                    AR.hz_cust_accounts hca ON hp.party_id = hca.party_id
+                LEFT JOIN 
+                    AR.hz_cust_acct_sites_all hcas ON hca.cust_account_id = hcas.cust_account_id
+                LEFT JOIN 
+                    AR.hz_party_sites hps ON hps.party_site_id = hcas.party_site_id
+                LEFT JOIN 
+                    AR.hz_cust_site_uses_all hcsu ON hcas.cust_acct_site_id = hcsu.cust_acct_site_id
+                LEFT JOIN 
+                    AR.hz_locations hl ON hps.location_id = hl.location_id
+                JOIN 
+                    APPS.hr_operating_units hou ON hcas.org_id = hou.organization_id
+                WHERE 
+                    hp.party_type = 'ORGANIZATION' 
+                    AND hp.status = 'A' 
+                    AND hps.status = 'A' 
+                    AND hcas.org_id = 84 
+                    AND hcsu.site_use_code = 'BILL_TO' 
+                    AND hca.account_number = {$item['customer']}
+                ORDER BY 
+                    hp.party_name, hca.account_number") ?? null;
+                } catch (PDOException $e){
+                    $price_list = null;
+                }
+               
+
+                if (!empty($price_list)){
+                    try{
+                    
+                $price = DB::connection('oracle')->select("SELECT
+                    QSLH.NAME AS M_PRICE_CODE,
+                    MSI.SEGMENT1 AS M_ITEM_CODE,
+                    QPLL.OPERAND ,
+                    QPPR.PRODUCT_ATTR_VALUE,
+                    QSLH.LIST_HEADER_ID
+                FROM
+                    APPS.QP_SECU_LIST_HEADERS_V QSLH
+                JOIN
+                    QP.QP_LIST_LINES QPLL ON QSLH.LIST_HEADER_ID = QPLL.LIST_HEADER_ID
+                JOIN
+                    QP.QP_PRICING_ATTRIBUTES QPPR ON QPPR.LIST_LINE_ID = QPLL.LIST_LINE_ID
+                JOIN
+                    INV.MTL_SYSTEM_ITEMS_B MSI ON QPPR.PRODUCT_ATTR_VALUE = MSI.INVENTORY_ITEM_ID
+                WHERE
+                    QPLL.END_DATE_ACTIVE IS NULL
+                    AND MSI.ORGANIZATION_ID = 103
+                    AND MSI.SEGMENT1 = '{$trupart->trupart}'
+                    AND QSLH.LIST_HEADER_ID = {$price_list[0] -> price_list_id}
+                ORDER BY
+                    M_ITEM_CODE") ?? 0;
+                    } catch (PDOException $e){
+                        $price = null;
+                    }
+                    
+
+                }
+
                 Listitem::create([
                     'plandue_id' => $plan->id,
                     'created_by' => auth()->id(),
                     'duedate' => $item['duedate'],
+                    'customer' => $item['customer'],
                     'issue' => $item['issue'],
                     'outpart' => $item['outpart'],
+                    'prize'=>  $item['quantity'] * ($price[0]->operand ?? 0) ?? null,
                     'quantity' => $item['quantity'],
                 ]);
             }
@@ -314,8 +438,20 @@ class PlanCRUD extends Component
                 foreach($this->editItemDetails as $index  => $item)           
                 $this->validate([
                     "editItemDetails.$index.duedate" => "required|date",
+                    "editItemDetails.$index.customer" => ["required","string",Rule::exists('parts','customer')],
                     "editItemDetails.$index.issue" => "required|string|unique:listitems,issue," . $item['id'],
-                    "editItemDetails.$index.outpart" => ['required','string',Rule::exists('parts','outpart')],
+                    "editItemDetails.$index.outpart" => ['required','string',
+                    function ($attribute, $value, $fail){
+                        $index = explode('.', $attribute)[1];
+                        $customer = $this->itemDetails[$index]['customer'];
+                        $outpart = $this->itemDetails[$index]['outpart'];
+            
+                        // Check if the combination of customer and outpart exists in the parts table
+                        if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
+                            $fail("The outpart '$outpart' does not exist for customer '$customer'.");
+                        }
+                    }
+                    ],
                     "editItemDetails.$index.quantity" => "required|numeric",
                     ],[
                     "editItemDetails.$index.duedate.required" => "DueDate is required.",

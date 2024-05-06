@@ -48,7 +48,7 @@ class PlandueExport implements WithHeadings , WithCustomStartCell,WithStyles,Wit
 
     public function headings(): array
     {
-        return['Due date','Customer','Issue No.','Part No.','Part name','Quantity','JOB','Weight','Remark'];
+        return['Due date','Customer','Part No.','Part name','Quantity','Issue No.','JOB','Weight','Remark'];
     }
 
     public function startCell(): string
@@ -63,10 +63,10 @@ class PlandueExport implements WithHeadings , WithCustomStartCell,WithStyles,Wit
         $sheet->getRowDimension('6')->setRowHeight(20);
         $sheet->getColumnDimension('A')->setWidth(12);
         $sheet->getColumnDimension('B')->setWidth(20);
-        $sheet->getColumnDimension('C')->setWidth(20);
+        $sheet->getColumnDimension('C')->setWidth(15);
         $sheet->getColumnDimension('D')->setWidth(15);
-        $sheet->getColumnDimension('E')->setWidth(15);
-        $sheet->getColumnDimension('F')->setWidth(9);
+        $sheet->getColumnDimension('E')->setWidth(9);
+        $sheet->getColumnDimension('F')->setWidth(20);
         $sheet->getColumnDimension('G')->setWidth(15);
         $sheet->getColumnDimension('H')->setWidth(9);
         $sheet->getColumnDimension('I')->setWidth(20);
@@ -76,20 +76,21 @@ class PlandueExport implements WithHeadings , WithCustomStartCell,WithStyles,Wit
         $sheet->setShowGridlines(false);
         $sheet->setCellValue('A2','PlanDue ID :');
         $sheet->setCellValue('B2',$this->data->plan_id);
-        $sheet->setCellValue('A3','Create By :');
+        $sheet->setCellValue('A3','Created By :');
         $sheet->setCellValue('B3',$this->test2->name);
-
+        $sheet->setCellValue('A4','Approved By :');
+        $sheet->setCellValue('B4',$this->test2->name);
         $currentRow = 7;
         
         foreach($this->test as $t)
         {
             $weight = Part::where('outpart',$t->outpart)->first();
             $sheet->setCellValue("A{$currentRow}",$t->duedate);
-            $sheet->setCellValue("B{$currentRow}",$weight->type);
-            $sheet->setCellValue("C{$currentRow}",$t->issue);
-            $sheet->setCellValue("D{$currentRow}",$t->outpart);
-            $sheet->setCellValue("E{$currentRow}",$weight->partname);
-            $sheet->setCellValue("F{$currentRow}",$t->quantity);
+            $sheet->setCellValue("B{$currentRow}",$weight->type ?? null);
+            $sheet->setCellValue("C{$currentRow}",$t->outpart);
+            $sheet->setCellValue("D{$currentRow}",$weight->partname ?? null);
+            $sheet->setCellValue("E{$currentRow}",$t->quantity);
+            $sheet->setCellValue("F{$currentRow}",$t->issue);
             $sheet->setCellValue("G{$currentRow}",'JOB');
             $sheet->setCellValue("H{$currentRow}",'Weight');
             $sheet->setCellValue("I{$currentRow}",'Remark');
