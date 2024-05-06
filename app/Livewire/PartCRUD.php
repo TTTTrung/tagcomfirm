@@ -82,7 +82,7 @@ class PartCRUD extends Component
         $this->selectedPartData = Part::find($id);
         if($this->selectedPartData)
         {
-        $this->etypee = $this->selectedPartData['vendor']?? null;
+        $this->evendor = $this->selectedPartData['customer']?? null;
         $this->etypee = $this->selectedPartData['type']?? null;
         $this->epartname= $this->selectedPartData['partname']?? null;
         $this->eoutpart= $this->selectedPartData['outpart']?? null;
@@ -115,7 +115,7 @@ class PartCRUD extends Component
 
         Part::where('id', $this->selectedPartData['id'])->update([
             
-            'vendor' => $this->evendor,
+            'customer' => $this->evendor,
             'type' => $this->etypee,
             'partname' => $this->epartname,
             'outpart' => $this->eoutpart,
