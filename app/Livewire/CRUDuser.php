@@ -114,7 +114,6 @@ class CRUDuser extends Component
     }
     public function changePassword()
     { 
-        dd('test');
         $this->validate([
             'newPassword' => ["required","min:6"],
             'conPassword' => ["required","same:newPassword"]
