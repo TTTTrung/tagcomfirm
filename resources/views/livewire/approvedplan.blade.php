@@ -61,6 +61,9 @@
                                 Issue no.
                             </th>
                             <th scope="col" class="px-6 py-3">
+                                PO.
+                            </th>
+                            <th scope="col" class="px-6 py-3">
                                 Outside part
                             </th>
                             <th scope="col" class="px-6 py-3">
@@ -68,6 +71,9 @@
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 Price 
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Body
                             </th>                                            
                         </tr>
                     </thead>
@@ -84,6 +90,9 @@
                                 {{ $listitem->issue }}
                             </td>
                             <td class="px-6 py-4">
+                                {{ $listitem->po }}
+                            </td>
+                            <td class="px-6 py-4">
                                 {{ $listitem->outpart }}
                             </td>
                             <td class="px-6 py-4">
@@ -92,6 +101,9 @@
                             
                             <td class="px-6 py-4">
                                 {{$listitem->prize }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $listitem->body }}
                             </td>
                         </tr>   
                     @endforeach
