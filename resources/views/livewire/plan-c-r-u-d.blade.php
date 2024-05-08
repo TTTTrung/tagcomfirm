@@ -115,9 +115,9 @@
     {{-- Create modal --}}
     @if($showCreateModal)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="hideCreateModal"></div>
-    <form wire:submit.prevent="createPlan" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1200px' }">
+    <form wire:submit.prevent="createPlan" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1400px' }">
         <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
-            <div class="text-xl font-bold">Modal Header</div>
+            <div class="text-xl font-bold">Create Modal</div>
             <button wire:click="hideCreateModal" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -129,14 +129,16 @@
                 @if($duplicateInput)
                 <h3 class="text-red-500 text-xs">There is a duplicate input value in issue field.</h3>
                 @endif
-                <table class="mt-4 max-w-7xl text-sm text-left rtl:text-right text-gray-500">
+                <table class="mt-4 max-w-8xl text-sm text-left rtl:text-right text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3">Due Date</th>
                             <th scope="col" class="px-6 py-3">Customer Id.</th>
                             <th scope="col" class="px-6 py-3">Issue No.</th>
+                            <th scope="col" class="px-6 py-3">PO.</th>
                             <th scope="col" class="px-6 py-3">Outside part No.</th>
                             <th scope="col" class="px-6 py-3">Quantity</th>
+                            <th scope="col" class="px-6 py-3">Body</th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
@@ -159,6 +161,11 @@
                                 @enderror 
                             </td>
                             <td class="px-6" >
+                                @error('itemDetails.' . $rowIndex . '.po') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
+                            <td class="px-6" >
                                 @error('itemDetails.' . $rowIndex . '.outpart') 
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
@@ -168,24 +175,35 @@
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
                             </td>
+                            <td class="px-6" >
+                                @error('itemDetails.' . $rowIndex . '.body') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
                         </tr>
                             <tr class="bg-white border-b hover:bg-gray-50">
                                 
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="itemDetails.{{ $rowIndex }}.duedate" type="date" class="w-full p-2 border border-gray-300 rounded" required />
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.duedate" type="datetime-local" class="w-full p-2 border border-gray-300 text-xs rounded" required />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="itemDetails.{{ $rowIndex }}.customer" type="text" class="w-full p-2 border border-gray-300 rounded"  />
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.customer" type="text" class="w-full p-2 border border-gray-300 rounded text-sm"  />
                                     </td>
                                    
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="itemDetails.{{ $rowIndex }}.issue" type="text" class="w-full p-2 border border-gray-300 rounded"  />
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.issue" type="text" class="w-full p-2 border border-gray-300 text-sm rounded"  />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="itemDetails.{{ $rowIndex }}.outpart" type="text" class="w-full p-2 border border-gray-300 rounded" required />
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.po" type="text" class="w-full p-2 border border-gray-300 text-sm rounded"  />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="itemDetails.{{ $rowIndex }}.quantity" type="text" class="w-full p-2 border border-gray-300 rounded" required />     
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.outpart" type="text" class="w-full p-2 border border-gray-300 text-sm rounded" required />
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.quantity" type="text" class="w-full p-2 border border-gray-300 text-sm rounded" required />     
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.body" type="text" class="w-full p-2 border border-gray-300 text-sm rounded" />     
                                     </td>
                                 
                                 <td class="px-6 py-4">
@@ -267,9 +285,9 @@
 
  @if($showEditModal)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="hideEditModal"></div>
-    <form wire:submit.prevent="editPlan" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1200px' }">
+    <form wire:submit.prevent="editPlan" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1400px' }">
         <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
-            <div class="text-xl font-bold">Modal Header</div>
+            <div class="text-xl font-bold">Edit Modal</div>
             <button wire:click="hideEditModal" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -285,9 +303,12 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3">Due Date</th>
+                            <th scope="col" class="px-6 py-3">Customer</th>
                             <th scope="col" class="px-6 py-3">Issue No.</th>
+                            <th scope="col" class="px-6 py-3">PO.</th>
                             <th scope="col" class="px-6 py-3">Outside part No.</th>
                             <th scope="col" class="px-6 py-3">Quantity</th>
+                            <th scope="col" class="px-6 py-3">Body</th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
@@ -300,7 +321,17 @@
                                 @enderror 
                             </td>
                             <td class="px-6" >
+                                @error('editItemDetails.' . $rowIndex . '.customer') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
+                            <td class="px-6" >
                                 @error('editItemDetails.' . $rowIndex . '.issue') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
+                            <td class="px-6" >
+                                @error('editItemDetails.' . $rowIndex . '.po') 
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
                             </td>
@@ -314,20 +345,34 @@
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
                             </td>
+                            <td class="px-6" >
+                                @error('editItemDetails.' . $rowIndex . '.body') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
                         </tr>
                             <tr class="bg-white border-b hover:bg-gray-50">                                
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editItemDetails.{{ $rowIndex }}.duedate" type="date" class="w-full p-2 border border-gray-300 rounded" required />
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.duedate" type="datetime-local" class="w-full p-2 border border-gray-300 rounded text-sm" required />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editItemDetails.{{ $rowIndex }}.issue" type="text" class="w-full p-2 border border-gray-300 rounded" required />
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.customer" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editItemDetails.{{ $rowIndex }}.outpart" type="text" class="w-full p-2 border border-gray-300 rounded" required />
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.issue" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editItemDetails.{{ $rowIndex }}.quantity" type="text" class="w-full p-2 border border-gray-300 rounded" required />     
-                                    </td>                                
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.po" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.outpart" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.quantity" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />     
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.body" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" />     
+                                    </td>                                  
                                 <td class="px-6 py-4">
                                     <button type="button" wire:click="editRemove({{ $rowIndex }})" class="text-red-500 focus:outline-none">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">

@@ -20,7 +20,7 @@ class PlanCRUD extends Component
     use WithFileUploads;
     public $showCreateModal = false;
     public $itemDetails = [
-        ['duedate' => '','customer'=>'', 'issue' => '', 'outpart' => '', 'quantity' => ''],
+        ['duedate' => '','customer'=>'', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '', 'body' => ''],
     ];
     public $getOutpartSuggestions;
 
@@ -102,7 +102,7 @@ class PlanCRUD extends Component
 
     public function addItem()
     {
-        $this->itemDetails[] = ['duedate' => '','customer'=>'', 'issue' => '', 'outpart' => '', 'quantity' => ''];
+        $this->itemDetails[] = ['duedate' => '','customer'=>'', 'issue' => '','po'=> '', 'outpart' => '', 'quantity' => '','body' => ''];
     }
 
     public function clearItem()
@@ -123,7 +123,7 @@ class PlanCRUD extends Component
     $this->validate([
         'itemDetails.*.duedate' => 'required|date',
         'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
-        'itemDetails.*.issue' => 'string',
+        'itemDetails.*.issue' => 'required|string',
         'itemDetails.*.outpart' => ['required',Rule::exists('parts','outpart')],
         'itemDetails.*.quantity' => 'required|numeric',
     ],
@@ -143,6 +143,7 @@ class PlanCRUD extends Component
         $searchPattern = "IS-{$currentDate}-";
 
         foreach($this->itemDetails as $checkIssue) {
+            // dd($checkIssue);
             if (empty($checkIssue['issue'])) {
                 $latestIssue = Listitem::latest()->where('issue', 'LIKE', "%{$searchPattern}%")->first();
                 $countIssue = $latestIssue ? (int) substr($latestIssue->issue, -4) + 1 : 1;
@@ -163,31 +164,47 @@ class PlanCRUD extends Component
               
                 $maxQuantity = Part::where('customer', $checkIssue['customer'])->where('outpart',$checkIssue['outpart'])->first();
                 $snp = $maxQuantity->snp ?? null;
-                
+                $baseBody = $checkIssue['body'];
                 if ($snp && $checkIssue['quantity'] > $snp) {
                     $setNeeded = ceil($checkIssue['quantity'] / $snp);
                     for ($i = 1; $i <= $setNeeded; $i++) {
                         $count = $latestNumber + $i;
-                        $quantityToAdd = min($checkIssue['quantity'], $snp);
+                        $quantityToAdd = min($checkIssue['quantity'], $snp); 
+                        if (is_numeric($baseBody)) {
+                            $finalBody = $baseBody + $quantityToAdd - 1 ?? null;
+                            $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
+                        }
                         $this->itemDetails[] = [
                             'duedate' => $this->itemDetails[0]['duedate'],
                             'customer' => $this->itemDetails[0]['customer'],
                             'issue' => "{$count}-{$this->itemDetails[0]['issue']}",
+                            'po' => $this->itemDetails[0]['po'],
                             'outpart' => $this->itemDetails[0]['outpart'],
                             'quantity' => $quantityToAdd,
+                            'body' => $body ?? $baseBody,
                         ];
                         $checkIssue['quantity'] -= $quantityToAdd;
+                        if (is_numeric($baseBody))
+                        {
+                            $baseBody = $finalBody + 1 ?? null; 
+                        }
                     }
                     array_splice($this->itemDetails, 0, 1);
                 }
                 else
                 {
+                    if (is_numeric($baseBody)) {
+                        $finalBody = $baseBody + $checkIssue['quantity'] - 1 ?? null;
+                        $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
+                    }
                     $this->itemDetails[] = [
                         'duedate' => $this->itemDetails[0]['duedate'],
                         'customer' => $this->itemDetails[0]['customer'],
                         'issue' => $latestIssue > 0 ? ($latestIssue + 1) . "-{$this->itemDetails[0]['issue']}" : $this->itemDetails[0]['issue'],
+                        'po' => $this->itemDetails[0]['po'],
                         'outpart' => $this->itemDetails[0]['outpart'],
                         'quantity' => $this->itemDetails[0]['quantity'],
+                        'body' => $body ?? $baseBody,
                     ];
                     array_splice($this->itemDetails, 0, 1);
                 }
@@ -213,7 +230,17 @@ class PlanCRUD extends Component
             $this->validate([
                 'itemDetails.*.duedate' => 'required|date',
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
-                'itemDetails.*.issue' => 'required|string|unique:listitems,issue',
+                'itemDetails.*.issue' => ['required','string',
+                function ($attribute, $value,$fail){
+                    $index = explode('.', $attribute)[1];
+                    $customer = $this->itemDetails[$index]['customer'];
+                    $issue = $this->itemDetails[$index]['issue'];
+
+                    if(Listitem::where('customer', $customer)->where('issue', $issue)->exists()){
+                        $fail("The issue is duplicate");
+                    }
+                }],
+                'itemDetails.*.po' => 'required',
                 'itemDetails.*.outpart' => ['required','string',
                 function ($attribute, $value, $fail){
                     $index = explode('.', $attribute)[1];
@@ -246,6 +273,7 @@ class PlanCRUD extends Component
                 'itemDetails.*.duedate.date' => 'Date must be valid date.',
                 'itemDetails.*.issue.required' => 'Issue field is required.',
                 'itemDetails.*.issue.unique' => 'Issue must be unique.',
+                'itemDetails.*.po.required' => 'PO field is required.',
                 'itemDetails.*.outpart.required' => 'Outpart field is required.',
                 'itemDetails.*.outpart.exists' => 'Outpart does not exist.',
                 'itemDetails.*.quantity.required' => 'Quantity field is required.',
@@ -360,16 +388,18 @@ class PlanCRUD extends Component
                     
 
                 }
-
+                // dd($item);
                 Listitem::create([
                     'plandue_id' => $plan->id,
                     'created_by' => auth()->id(),
                     'duedate' => $item['duedate'],
                     'customer' => $item['customer'],
                     'issue' => $item['issue'],
+                    'po' => $item['po'],
                     'outpart' => $item['outpart'],
                     'prize'=>  $item['quantity'] * ($price[0]->operand ?? 0) ?? null,
                     'quantity' => $item['quantity'],
+                    'body' => $item['body'],
                 ]);
             }
             $this->reset('itemDetails');
@@ -413,13 +443,13 @@ class PlanCRUD extends Component
     public function openEditModal($id)
     {   
         $this->editId = $id;
-        $this->editItems = Listitem::select('id','outpart','duedate','issue','quantity')->where('plandue_id',$id)->get();
+        $this->editItems = Listitem::select('id','customer','po','body','outpart','duedate','issue','quantity')->where('plandue_id',$id)->get();
         // dd($this->editItems->toArray());
         if(!empty($this->editItems))
         {
             foreach($this->editItems as $editItem)
             {
-            $this->editItemDetails[] = ['id'=>$editItem->id , 'duedate' => $editItem->duedate , 'issue' => $editItem->issue, 'outpart' => $editItem->outpart, 'quantity' =>$editItem->quantity];
+            $this->editItemDetails[] = ['id'=>$editItem->id ,'customer' => $editItem->customer, 'duedate' => $editItem->duedate , 'issue' => $editItem->issue,'po' => $editItem->po, 'outpart' => $editItem->outpart, 'quantity' =>$editItem->quantity, 'body'=>$editItem->body];
             }
         }
         $this->countEditItems = count($this->editItemDetails);
@@ -439,7 +469,17 @@ class PlanCRUD extends Component
                 $this->validate([
                     "editItemDetails.$index.duedate" => "required|date",
                     "editItemDetails.$index.customer" => ["required","string",Rule::exists('parts','customer')],
-                    "editItemDetails.$index.issue" => "required|string|unique:listitems,issue," . $item['id'],
+                    "editItemDetails.$index.issue" => ['required','string',
+                    function ($attribute, $value,$fail){
+                        $index = explode('.', $attribute)[1];
+                        $customer = $this->itemDetails[$index]['customer'];
+                        $issue = $this->itemDetails[$index]['issue'];
+
+                        if(Listitem::where('customer', $customer)->where('issue', $issue)->exists()){
+                            $fail("The issue is duplicate");
+                        }
+                    }],
+                    "editItemDetails.$index.po" => 'required',
                     "editItemDetails.$index.outpart" => ['required','string',
                     function ($attribute, $value, $fail){
                         $index = explode('.', $attribute)[1];
