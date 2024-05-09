@@ -47,16 +47,20 @@ class PlanCRUD extends Component
             $duedate = $row[0];
             $customer = $row[1];
             $issue = $row[2];
-            $outpart = $row[3];
-            $quantity = $row[4];
+            $po = $row[3];
+            $outpart = $row[4];
+            $quantity = $row[5];
+            $body = $row[6];
         
             
             $itemDetails = [
                 'duedate' => $duedate,
                 'customer' => $customer,
                 'issue' => $issue,
+                'po' => $po,
                 'outpart' => $outpart,
                 'quantity' => $quantity,
+                'body' => $body,
             ];
 
             $itemDetailsArray[] = $itemDetails;
@@ -523,9 +527,12 @@ class PlanCRUD extends Component
                     } 
                     Listitem::where('id', $updateItem['id'])->update([
                             'duedate' => $updateItem['duedate'],
+                            'customer' => $updateItem['customer'],
                             'issue' => $updateItem['issue'],
+                            'po' => $updateItem['po'],
                             'outpart'=>$updateItem['outpart'],
                             'quantity'=>$updateItem['quantity'],
+                            'body' =>$updateItem['body'],
                             'updated_by' => auth()->id(),
                         ]);
                 }

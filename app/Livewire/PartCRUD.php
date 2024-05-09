@@ -21,6 +21,7 @@ class PartCRUD extends Component
     public $snp;
     public $weight;
     public $customer;
+    public $wlh;
 
     public $evendor;
     public $etypee;
@@ -29,6 +30,7 @@ class PartCRUD extends Component
     public $etrupart;
     public $esnp;
     public $eweight;
+    public $ewlh;
 
     public $search;
     public $company = "";
@@ -41,7 +43,7 @@ class PartCRUD extends Component
     public function hideCreateModal()
     {   
         $this->showCreateModal = false;
-        $this->reset(['typee','partname','outpart','trupart','snp','weight','customer']);
+        $this->reset(['typee','partname','outpart','trupart','snp','weight','customer','wlh']);
         $this->resetValidation();
     }
 
@@ -60,7 +62,8 @@ class PartCRUD extends Component
         ],
         'trupart' => 'required|string',
         'snp' => 'required|numeric|gt:0',
-        'weight' => 'required|numeric|gte:0'
+        'weight' => 'required|numeric|gte:0',
+        'wlh' => 'required|string',
        ]);
 
        Part::create([
@@ -71,6 +74,7 @@ class PartCRUD extends Component
             'trupart' => $this->trupart,
             'snp' =>    $this->snp,
             'weight' => $this->weight,
+            'pl_size' => $this->wlh,
             'created_by' => auth()->id()
        ]);
 
@@ -84,12 +88,12 @@ class PartCRUD extends Component
         {
         $this->evendor = $this->selectedPartData['customer']?? null;
         $this->etypee = $this->selectedPartData['type']?? null;
-        $this->epartname= $this->selectedPartData['partname']?? null;
-        $this->eoutpart= $this->selectedPartData['outpart']?? null;
-        $this->etrupart= $this->selectedPartData['trupart']?? null;
-        $this->esnp= $this->selectedPartData['snp']?? null;
-        $this->eweight= $this->selectedPartData['weight']?? null;
-        
+        $this->epartname = $this->selectedPartData['partname']?? null;
+        $this->eoutpart = $this->selectedPartData['outpart']?? null;
+        $this->etrupart = $this->selectedPartData['trupart']?? null;
+        $this->esnp = $this->selectedPartData['snp']?? null;
+        $this->eweight = $this->selectedPartData['weight']?? null;
+        $this->ewlh = $this->selectedPartData['pl_size']?? null;
         $this->showEditModal = true;
         }
     }
@@ -98,7 +102,7 @@ class PartCRUD extends Component
     {
         $this->showEditModal = false;
         $this->resetValidation();
-        $this->reset(['etypee','epartname','eoutpart','etrupart','esnp','eweight','evendor']);
+        $this->reset(['etypee','epartname','eoutpart','etrupart','esnp','eweight','evendor','ewlh']);
     }
 
     public function editPart()
@@ -110,7 +114,8 @@ class PartCRUD extends Component
         'eoutpart' => 'required|string|unique:parts,outpart,' . $this->selectedPartData['id'],
         'etrupart' => 'required|string',
         'esnp' => 'required|numeric|gt:0',
-        'eweight' => 'required|numeric|gte:0'
+        'eweight' => 'required|numeric|gte:0',
+        'ewlh' => 'required',
         ]);
 
         Part::where('id', $this->selectedPartData['id'])->update([
@@ -122,6 +127,7 @@ class PartCRUD extends Component
             'trupart' => $this->etrupart,
             'snp' =>    $this->esnp,
             'weight' => $this->eweight,
+            'pl_size' => $this->ewlh,
             'updated_by' => auth()->id()
 
         ]);

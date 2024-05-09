@@ -16,8 +16,10 @@ class ListitemImport implements ToCollection
                 'duedate' => $rows[0],
                 'customer' => $rows[1],
                 'issue' => $rows[2],
-                'outpart' => $rows[3],
-                'quantity' => $rows[4],
+                'po' => $rows[3],
+                'outpart' => $rows[4],
+                'quantity' => $rows[5],
+                'body' => $rows[6],
            ];        
     }
 }

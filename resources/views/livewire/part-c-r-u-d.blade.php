@@ -58,6 +58,9 @@
                                 <th scope="col" class="px-6 py-3">
                                     Weight
                                 </th>
+                                <th scope="col" class="px-6 py-3">
+                                    W*L*H
+                                </th>
                                 {{-- <th scope="col" class="px-6 py-3">
                                     Created by
                                 </th>
@@ -96,6 +99,9 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     {{$part->weight }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->pl_size }}
                                 </td>
                                 {{-- <td class="px-6 py-4">
                                     {{ optional($part->createdBy)->name }}
@@ -188,7 +194,14 @@
                         @error('weight') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
-                    </div>     
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="wlh" class="block mb-2 text-sm font-medium text-gray-900">W*L*H</label>
+                        <input id="wlh" wire:model="wlh" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('wlh') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>      
                 </div>
         </div>
     <div class="bg-gray-100 w-full flex justify-end p-4">
@@ -261,6 +274,13 @@
                         <label for="eweight" class="block mb-2 text-sm font-medium text-gray-900">Weight for each part</label>
                         <input id="eweight" wire:model="eweight" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
                         @error('eweight') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="ewlh" class="block mb-2 text-sm font-medium text-gray-900">W*L*H</label>
+                        <input id="ewlh" wire:model="ewlh" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('ewlh') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
                     </div>     

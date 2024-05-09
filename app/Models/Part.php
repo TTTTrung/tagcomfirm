@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Part extends Model
 {
     use HasFactory;
-    protected $fillable = ['customer','type','partname','outpart','trupart','snp','weight','created_by','updated_by'];
+    protected $fillable = ['customer','type','partname','outpart','trupart','snp','weight','created_by','updated_by','pl_size'];
 
     public function createdBy()
     {

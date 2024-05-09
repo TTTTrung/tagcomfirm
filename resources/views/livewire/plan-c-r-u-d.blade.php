@@ -54,7 +54,7 @@
                                                     Due date
                                                 </th>
                                                 <th scope="col" class="px-6 py-3">
-                                                    Issue no.
+                                                    Issue/serial/lot/line
                                                 </th>
                                                 <th scope="col" class="px-6 py-3">
                                                     PO.
@@ -130,7 +130,7 @@
     <form wire:submit.prevent="createPlan" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1400px' }">
         <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Create Modal</div>
-            <button wire:click="hideCreateModal" class="focus:outline-none">
+            <button wire:click="hideCreateModal" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -146,7 +146,7 @@
                         <tr>
                             <th scope="col" class="px-6 py-3">Due Date</th>
                             <th scope="col" class="px-6 py-3">Customer Id.</th>
-                            <th scope="col" class="px-6 py-3">Issue No.</th>
+                            <th scope="col" class="px-6 py-3">Issue/serial/lot/line</th>
                             <th scope="col" class="px-6 py-3">PO.</th>
                             <th scope="col" class="px-6 py-3">Outside part No.</th>
                             <th scope="col" class="px-6 py-3">Quantity</th>
@@ -300,7 +300,7 @@
     <form wire:submit.prevent="editPlan" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1400px' }">
         <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Edit Modal</div>
-            <button wire:click="hideEditModal" class="focus:outline-none">
+            <button wire:click="hideEditModal" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -316,7 +316,7 @@
                         <tr>
                             <th scope="col" class="px-6 py-3">Due Date</th>
                             <th scope="col" class="px-6 py-3">Customer</th>
-                            <th scope="col" class="px-6 py-3">Issue No.</th>
+                            <th scope="col" class="px-6 py-3">Issue/serial/lot/line</th>
                             <th scope="col" class="px-6 py-3">PO.</th>
                             <th scope="col" class="px-6 py-3">Outside part No.</th>
                             <th scope="col" class="px-6 py-3">Quantity</th>

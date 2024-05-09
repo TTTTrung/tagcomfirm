@@ -58,7 +58,7 @@
                                 Due date
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                Issue no.
+                                Issue/serial/lot/line
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 PO.

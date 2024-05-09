@@ -33,6 +33,9 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth',RoleMiddleware::class.':superAdmin|plAdmin|plSuperAdmin'])->group(function(){
     Route::get('/plan',[PlancreateController::class, 'index'])->name('plan');
     Route::get('/part',[PartController::class, 'index'])->name('part');
+});
+Route::middleware(['auth',RoleMiddleware::class.':superAdmin|plAdmin|plSuperAdmin|commoner'])->group(function(){
+    
     Route::get('/listplan',[ApprovedplanController::class, 'index'])->name('listplan');
 });
 

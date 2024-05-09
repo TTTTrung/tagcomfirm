@@ -124,6 +124,7 @@
                         <option value="scanner">Scanner</option>
                         <option value="plAdmin">PlAdmin</option>
                         <option value="plSuperAdmin">plSuperAdmin</option>
+                        <option value="commoner">commoner</option>
                         </select>
                         @error('selectedRoles') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
@@ -142,10 +143,10 @@
 
 @if($showEditModal)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="hideEditModal"></div>
-    <form class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '550px', 'max-width' : '35rem' }" wire:submit.prevent="editUser">
+    <form wire:submit.prevent="editUser" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '550px', 'max-width' : '35rem' }" >
         <div class="bg-yellow-400 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Edit User</div>
-            <button wire:click="hideEditModal" class="focus:outline-none">
+            <button wire:click="hideEditModal" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -180,6 +181,7 @@
                         <option value="scanner">Scanner</option>
                         <option value="plAdmin">PlAdmin</option>
                         <option value="plSuperAdmin">plSuperAdmin</option>
+                        <option value="commoner">commoner</option>
                         </select>
                         @error('edSelectedRoles') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
@@ -199,7 +201,7 @@
     <form class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '550px', 'max-width' : '35rem' }" wire:submit.prevent="changePassword">
         <div class="bg-yellow-400 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Change user Password</div>
-            <button wire:click="hidePasswordModal" class="focus:outline-none">
+            <button wire:click="hidePasswordModal" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -226,7 +228,7 @@
                 </div>
         </div>
     <div class="bg-gray-100 w-full flex justify-end p-4">
-        <button type="submit" class="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
+        <button class="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
     </div>
     </form>
 </div>
