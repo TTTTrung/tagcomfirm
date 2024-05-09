@@ -16,16 +16,20 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div> --}}
+                @role(['plAdmin','plSuperAdmin','superAdmin'])
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('plan')" :active="request()->routeIs('plan')">
                         {{ __('Plan') }}
                     </x-nav-link>
                 </div>
+                @endrole
+                @role(['plAdmin','plSuperAdmin','superAdmin'])
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('part')" :active="request()->routeIs('part')">
                         {{ __('AddPart') }}
                     </x-nav-link>
                 </div>
+                @endrole
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('listplan')" :active="request()->routeIs('listplan')">
                         {{ __('ListPlan') }}
