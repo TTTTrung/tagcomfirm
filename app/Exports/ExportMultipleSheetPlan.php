@@ -179,7 +179,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->setCellValue("A{$count}", "THAI RUNG UNION CAR PUBLIC CO. TRU");
                     $sheet->setCellValue("A".($count +1),'P/O NO.');
                     $sheet->mergeCells("B".($count + 1).":D".($count + 1));
-                    $sheet->setCellValue("B".($count + 1), $tt->issue);
+                    $sheet->setCellValue("B".($count + 1), $tt->po);
 
 
                     $sheet->setCellValue("A".($count + 2),'Part Name');
@@ -250,7 +250,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
             
             public function headings(): array
             {
-                return ["ลำดับที่","ลูกค้า","เลขที่ของ","ชื่อของ","issue/serial/lot","PO.","ปริมาณ","SNP","น้ำหนัก","น้ำหนักรวม","จำนวนหีบห่อ","ราคา/หน่วย","ราคารวม","REMARK"];
+                return ["ลำดับที่","ลูกค้า","เลขที่ของ","ชื่อของ","issue/serial/lot","PO.","ปริมาณ","Body","SNP","น้ำหนัก","น้ำหนักรวม","จำนวนหีบห่อ","W*L*H","ราคา/หน่วย","ราคารวม","REMARK"];
             }
             public function styles(Worksheet $sheet)
             {
@@ -291,8 +291,8 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     ],
                 ];
                  
-                $sheet->getStyle('A6:N6')->applyFromArray($styleArray);
-                $sheet->getStyle('A7:N7')->applyFromArray($styleBottomArray);
+                $sheet->getStyle('A6:P6')->applyFromArray($styleArray);
+                $sheet->getStyle('A7:P7')->applyFromArray($styleBottomArray);
                 $sheet->getStyle('A6:A7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('B6:B7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('C6:C7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
@@ -306,7 +306,9 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getStyle('K6:K7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('L6:L7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle('M6:M7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
-                $sheet->getStyle('A7:N7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('N6:N7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle('O6:O7')->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle('A7:P7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getRowDimension('6')->setRowHeight(20);
                 $sheet->getColumnDimension('A')->setWidth(8);
                 $sheet->getColumnDimension('B')->setWidth(20);
@@ -315,13 +317,15 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getColumnDimension('E')->setWidth(20);
                 $sheet->getColumnDimension('F')->setWidth(20);
                 $sheet->getColumnDimension('G')->setWidth(9);
-                $sheet->getColumnDimension('H')->setWidth(9);
+                $sheet->getColumnDimension('H')->setWidth(14);
                 $sheet->getColumnDimension('I')->setWidth(9);
                 $sheet->getColumnDimension('J')->setWidth(15);
                 $sheet->getColumnDimension('K')->setWidth(15);
                 $sheet->getColumnDimension('L')->setWidth(15);
                 $sheet->getColumnDimension('M')->setWidth(15);
                 $sheet->getColumnDimension('N')->setWidth(15);
+                $sheet->getColumnDimension('O')->setWidth(15);
+                $sheet->getColumnDimension('P')->setWidth(15);
 
                 $sheet->getStyle(6)->getFont()->setBold(true);
                 $sheet->setCellValue("A7","(No.)");
@@ -329,16 +333,26 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->setCellValue("C7","(Part no.)");
                 $sheet->setCellValue("D7","(Part name)");
                 $sheet->setCellValue("G7","(Q'ty)");
-                $sheet->setCellValue("H7","(SNP)");
-                $sheet->setCellValue("I7","(KG.)");
-                $sheet->setCellValue("J7","(Pallet)");
-                $sheet->setCellValue("K7","(Bath)");
-                $sheet->setCellValue("L7","(Bath)");
+                $sheet->setCellValue("I7","(SNP)");
+                $sheet->setCellValue("J7","(KG.)");
+                $sheet->setCellValue("K7","(KG.)");
+                $sheet->setCellValue("L7","(Pallet)");
+                $sheet->setCellValue("N7","(Bath)");
+                $sheet->setCellValue("O7","(Bath)");
                 $currentrow = 8;
 
                 foreach ($this->sumvalue as $index => $outpart){
                 $type = Part::where("outpart",$outpart->outpart)->where("customer",$outpart->customer)->first();
                 $is_po =$this->test->firstWhere('outpart',$outpart->outpart);
+                if(str_contains($is_po->body,"-"))
+                {
+                    $lastItem = $this->test->Where('outpart', $outpart->outpart)->last();
+                    if ($lastItem) {
+                        $lastBody = explode("-", $lastItem->body);
+                        $firstPart = explode("-", $is_po->body)[0];
+                        $body = $firstPart . "-" . $lastBody[1];
+                    }
+                }
                 $sheet->setCellValue("A{$currentrow}",$index + 1);
                 $sheet->setCellValue("B{$currentrow}",$type->type);
                 $sheet->setCellValue("C{$currentrow}",$outpart->outpart);
@@ -346,14 +360,16 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->setCellValue("E{$currentrow}",$is_po->issue);
                 $sheet->setCellValue("F{$currentrow}",$is_po->po);
                 $sheet->setCellValue("G{$currentrow}",$outpart->total_quantity);
-                $sheet->setCellValue("H{$currentrow}",$type->snp ?? null);
-                $sheet->setCellValue("I{$currentrow}",$type->weight ?? null);
-                $sheet->setCellValue("J{$currentrow}",$type->weight == null ? null :$outpart->total_quantity * $type->weight );
-                $sheet->setCellValue("K{$currentrow}",ceil($outpart->total_quantity / $type->snp) ?? null);
-                $sheet->setCellValue("L{$currentrow}", $outpart->total_price / $outpart->total_quantity ?? null);
-                $sheet->setCellValue("M{$currentrow}", $outpart->total_price ?? null);
+                $sheet->setCellValue("H{$currentrow}",$body ?? null);
+                $sheet->setCellValue("I{$currentrow}",$type->snp ?? null);
+                $sheet->setCellValue("J{$currentrow}",$type->weight ?? null);
+                $sheet->setCellValue("K{$currentrow}",$type->weight == null ? null :$outpart->total_quantity * $type->weight );
+                $sheet->setCellValue("L{$currentrow}",ceil($outpart->total_quantity / $type->snp) ?? null);
+                $sheet->setCellValue("M{$currentrow}", $type->pl_size ?? null);
+                $sheet->setCellValue("N{$currentrow}", $outpart->total_price / $outpart->total_quantity ?? null);
+                $sheet->setCellValue("O{$currentrow}", $outpart->total_price ?? null);
 
-                for ($col = 'A'; $col <= 'N'; $col++) {
+                for ($col = 'A'; $col <= 'P'; $col++) {
                     $sheet->getStyle("{$col}{$currentrow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("{$col}{$currentrow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                     $sheet->getStyle("{$col}{$currentrow}")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_DASHED);
