@@ -113,7 +113,7 @@
         </div>    
     </div>
 @endforeach
-<div>
+<div class="py-2 px-2">
     {{ $plands -> links() }}
 </div>
 </div>

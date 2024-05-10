@@ -138,7 +138,7 @@ class CRUDuser extends Component
     {
         $users = User::whereDoesntHave('roles',function (Builder $roleQuery){
             $roleQuery->where('name', 'superAdmin');
-        })->paginate(10);
+        })->orderBy('id','desc')->paginate(10);
 
         return view('livewire.c-r-u-duser',compact('users'));
     }

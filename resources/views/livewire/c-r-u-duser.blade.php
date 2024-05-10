@@ -70,10 +70,12 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
-                </div>
+                        <div class="py-2 px-2">
+                            {{ $users -> links() }} 
+                        </div> 
+                    </div>                
+                </div>    
             </div>
-            {{ $$users -> links() }}
         </div>
     </div>
 
