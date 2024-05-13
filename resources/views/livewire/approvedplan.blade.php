@@ -31,7 +31,8 @@
 </div>
     @foreach ($plands as $index => $pland)
     <div wire:key="items-{{ $index }}" class="wrapper">
-        <div x-data="{ isOpen: false }" @click="isOpen = !isOpen" class="tab px-5 py-2 bg-slate-100 shadow-lg relative mb-4 rounded-md cursor-pointer">
+        <div x-data="{ isOpen: false }" @click="isOpen = !isOpen" class="tab px-5 py-2 border-2 @if ($pland->status == 'done') border-green-600 @endif  
+            bg-slate-100 shadow-lg relative mb-4 rounded-md cursor-pointer">
             <div 
                 class="flex justify-between items-center font-semibold text-lg after:absolute after:right-5 after:text-2xl after:text-gray-400 hover:after:text-gray-950 peer-checked:after:transform peer-checked:after:rotate-45">
                 <div class="flex">
@@ -40,6 +41,12 @@
                     <h3 class="ml-1">{{ $pland->company_name }}</h3>
                 </div>
                 <div class="flex">
+                    @if ($pland->status == 'approved')
+                      <button wire:click.stop="markDone('{{ $pland->id }}', '{{ $pland->status }}')"  class="text-white bg-red-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                        Mark
+                    </button>  
+                    @endif
+                    
                     <button wire:click.stop="export({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                         Export Tag
                     </button>

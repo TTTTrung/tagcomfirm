@@ -6,6 +6,7 @@ use App\Models\User;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -43,23 +44,28 @@ class CRUDuser extends Component
 
     public function createUser()
     {
-        $this->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-        ]);
-
-        $user = User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => Hash::make($this->password),
-        ]);
-
-        // Assign selected roles to the newly created user
-        $user->assignRole($this->selectedRoles);
-
-        // Reset the input fields after creating the user
-        $this->hideCreateModal();
+            $this->validate([
+                            'name' => 'required|string',
+                            'email' => 'required|email|unique:users,email',
+                            'password' => 'required|min:6',
+                        ]);
+        try {
+            $user = User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'password' => Hash::make($this->password),
+            ]);
+    
+            // Assign selected roles to the newly created user
+            $user->assignRole($this->selectedRoles);
+            session()->flash('success', 'User created successfully.');
+            $this->hideCreateModal();
+        } catch (\Exception $e) {
+            // Handle exception, log error, and display a friendly message to the user
+            $this->hideCreateModal();
+            session()->flash('error', 'An error occurred while creating the user.');
+            Log::error('Error creating user: ' . $e->getMessage());
+        }
     }
 
     public function openEditModal($id)
@@ -94,12 +100,17 @@ class CRUDuser extends Component
             'edName' => ['required'],
             'edSelectedRoles' => ['required']
         ]);
+        try{
         User::where('id',$this->selectedUser->id)->update([
             'email' => $this->edEmail,
             'name' => $this->edName,
         ]);
         $this->selectedUser->syncRoles([$this->edSelectedRoles]);
+        session()->flash('success', 'User update successfully.');
         $this->hideEditModal();
+        }catch (\Exception $e){
+        session()->flash('error', 'An error occurred while update the user.');    
+        }
     }
     public function openPasswordModal($id)
     {
@@ -125,12 +136,18 @@ class CRUDuser extends Component
             'conPassword.same' => 'The password must match each other.'
         ]
         );
-        $passwordHash = Hash::make($this->newPassword);
+        try{
+            $passwordHash = Hash::make($this->newPassword);
 
-        User::where('id',$this->selectedUser->id)->update([
-            'password' =>  $passwordHash,
-        ]);
-        $this->hidePasswordModal();
+            User::where('id',$this->selectedUser->id)->update([
+                'password' =>  $passwordHash,
+            ]);
+            session()->flash('success', 'Password update successfully.');
+            $this->hidePasswordModal();
+        }
+        catch(\Exception $e){
+            session()->flash('error', 'An error occurred while update password the user.');
+        }
        
     }
     

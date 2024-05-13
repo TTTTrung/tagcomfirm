@@ -45,39 +45,24 @@ class Approvedplan extends Component
 
     }
 
-    // public function export2($id)
-    // {
-    //     $exportplan = Plandue::where('id', $id)->with('listitems')->with('createBy')->first();
-    //     $test = $exportplan->listitems;
-    //     $test2 = $exportplan->createBy;
-    //     if (!$exportplan) {
-    //         return response()->json(['error' => 'Plandue not found'], 404);
-    //     }
-    //     return Excel::download(new PlandueExport($exportplan,$test,$test2), 'plandue.xlsx');
-    // }
+    public function markDone($id,$status)
+    {
+        
+        try{
+            if($status == 'approved'){
+                Plandue::where('id',$id)->update(['status'=>'done']);
+            }
+        }
+        catch(\Exception $e)
+        {
 
-    // public function export3($id)
-    // {
-    //     $exportplan = Plandue::where('id', $id)->with('listitems')->with('createBy')->first();
-    //     $test = $exportplan->listitems;
-    //     $test2 = $exportplan->createBy;
-    //     $sumvalue = Listitem::select('outpart', 'customer', DB::raw('SUM(quantity) as total_quantity'),DB::raw('SUM(prize) as total_price'))
-    //     ->where('plandue_id', $id)
-    //     ->groupBy('outpart', 'customer') // Include customer in the group by clause
-    //     ->get();
-
-
-    //     if (!$exportplan) {
-    //         return response()->json(['error' => 'Plandue not found'], 404);
-    //     }
-    //     return Excel::download(new ShortPlanExport($exportplan,$test,$test2,$sumvalue), 'plandue.xlsx');
-    // }
-
+        }
+    }
 
     public function render()
     {
         $get_com = Plandue::whereNotNull('company_name')->distinct()->pluck('company_name');
-        $plands = Plandue::where('status','approved')
+        $plands = Plandue::whereNot('status','pending')
         ->with('listitems')
         ->when($this->mydata !== "", function($query){
             $query->where('created_by',auth()->id());

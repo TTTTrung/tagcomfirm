@@ -123,114 +123,96 @@ class PlanCRUD extends Component
     }
 
     public function checkQuantity()
-{
-    $this->validate([
+    {
+        $this->validate([
         'itemDetails.*.duedate' => 'required|date',
         'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
         'itemDetails.*.issue' => 'required|string',
-        'itemDetails.*.outpart' => ['required',Rule::exists('parts','outpart')],
+        'itemDetails.*.outpart' => ['required',
+            function ($attribute, $value, $fail){
+            $index = explode('.', $attribute)[1];
+            $customer = $this->itemDetails[$index]['customer'];
+            $outpart = $this->itemDetails[$index]['outpart'];
+
+            // Check if the combination of customer and outpart exists in the parts table
+            if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
+                $fail("The outpart '$outpart' does not exist for customer '$customer'.");
+            }
+        }],
         'itemDetails.*.quantity' => 'required|numeric',
-    ],
-    [
+        ],
+        [
         'itemDetails.*.duedate.required' => 'DueDate is required.',
         'itemDetails.*.duedate.date' => 'Date must be a valid date.',
         'itemDetails.*.customer.required' => 'Customer is required.',
         'itemDetails.*.customer.required' => 'Customer does not exist.',        
         'itemDetails.*.outpart.required' => 'Outpart field is required.',
-        'itemDetails.*.outpart.exists' => 'Outpart does not exist.',
         'itemDetails.*.quantity.required' => 'Quantity field is required.',
         'itemDetails.*.quantity.numeric' => 'Quantity must be numeric.',
-    ]);
+        ]);
 
-    if (!empty($this->itemDetails)) {
-        $currentDate = Carbon::now()->format('Ymd');
-        $searchPattern = "IS-{$currentDate}-";
+        foreach($this->itemDetails as $checkIssue) 
+        {
+            $latestIssue = Listitem::where('issue', 'LIKE' ,"%-{$checkIssue['issue']}")->orderByDesc('issue')->first();
+            $latestNumber = $latestIssue ? (int) explode('-', $latestIssue->issue)[0] : 0;
 
-        foreach($this->itemDetails as $checkIssue) {
-            // dd($checkIssue);
-            if (empty($checkIssue['issue'])) {
-                $latestIssue = Listitem::latest()->where('issue', 'LIKE', "%{$searchPattern}%")->first();
-                $countIssue = $latestIssue ? (int) substr($latestIssue->issue, -4) + 1 : 1;
-                $issueCounterFormatted = sprintf('%04d', $countIssue);
-                $customIssue = "IS-{$currentDate}-{$issueCounterFormatted}";
-                $this->itemDetails[0]['issue'] = $customIssue;
-                $latestNumber = 0;
-            }
-            else
-            {
-                $latestIssue = Listitem::where('issue', 'LIKE' ,"%-{$checkIssue['issue']}")->orderByDesc('issue')->first();
-                // dd($latestIssue);
-                $latestNumber = $latestIssue ? (int) explode('-', $latestIssue->issue)[0] : 0;
-                // dd(array( $latestNumber));
-            }
-
-            if (!empty($checkIssue['outpart'])) {
-              
-                $maxQuantity = Part::where('customer', $checkIssue['customer'])->where('outpart',$checkIssue['outpart'])->first();
-                $snp = $maxQuantity->snp ?? null;
-                $baseBody = $checkIssue['body'];
-                if ($snp && $checkIssue['quantity'] > $snp) {
-                    $setNeeded = ceil($checkIssue['quantity'] / $snp);
-                    for ($i = 1; $i <= $setNeeded; $i++) {
-                        $count = $latestNumber + $i;
-                        $quantityToAdd = min($checkIssue['quantity'], $snp); 
-                        if (is_numeric($baseBody)) {
-                            $finalBody = $baseBody + $quantityToAdd - 1 ?? null;
-                            $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
-                        }
-                        $this->itemDetails[] = [
-                            'duedate' => $this->itemDetails[0]['duedate'],
-                            'customer' => $this->itemDetails[0]['customer'],
-                            'issue' => "{$count}-{$this->itemDetails[0]['issue']}",
-                            'po' => $this->itemDetails[0]['po'],
-                            'outpart' => $this->itemDetails[0]['outpart'],
-                            'quantity' => $quantityToAdd,
-                            'body' => $body ?? $baseBody,
-                        ];
-                        $checkIssue['quantity'] -= $quantityToAdd;
-                        if (is_numeric($baseBody))
-                        {
-                            $baseBody = $finalBody + 1 ?? null; 
-                        }
-                    }
-                    array_splice($this->itemDetails, 0, 1);
-                }
-                else
-                {
+            $maxQuantity = Part::where('customer', $checkIssue['customer'])->where('outpart',$checkIssue['outpart'])->first();
+            $snp = $maxQuantity->snp ?? null;
+            $baseBody = $checkIssue['body'];
+            if ($snp && $checkIssue['quantity'] > $snp) {
+                $setNeeded = ceil($checkIssue['quantity'] / $snp);
+                for ($i = 1; $i <= $setNeeded; $i++) {
+                    $count = $latestNumber + $i;
+                    $quantityToAdd = min($checkIssue['quantity'], $snp); 
                     if (is_numeric($baseBody)) {
-                        $finalBody = $baseBody + $checkIssue['quantity'] - 1 ?? null;
+                        $finalBody = $baseBody + $quantityToAdd - 1 ?? null;
                         $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
                     }
                     $this->itemDetails[] = [
                         'duedate' => $this->itemDetails[0]['duedate'],
                         'customer' => $this->itemDetails[0]['customer'],
-                        'issue' => $latestIssue > 0 ? ($latestIssue + 1) . "-{$this->itemDetails[0]['issue']}" : $this->itemDetails[0]['issue'],
+                        'issue' => "{$count}-{$this->itemDetails[0]['issue']}",
                         'po' => $this->itemDetails[0]['po'],
                         'outpart' => $this->itemDetails[0]['outpart'],
-                        'quantity' => $this->itemDetails[0]['quantity'],
+                        'quantity' => $quantityToAdd,
                         'body' => $body ?? $baseBody,
                     ];
-                    array_splice($this->itemDetails, 0, 1);
+                    $checkIssue['quantity'] -= $quantityToAdd;
+                    if (is_numeric($baseBody))
+                    {
+                        $baseBody = $finalBody + 1 ?? null; 
+                    }
                 }
+                array_splice($this->itemDetails, 0, 1);
             }
+            else
+            {
+                if (is_numeric($baseBody)) {
+                    $finalBody = $baseBody + $checkIssue['quantity'] - 1 ?? null;
+                    $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
+                }
+                $this->itemDetails[] = [
+                    'duedate' => $this->itemDetails[0]['duedate'],
+                    'customer' => $this->itemDetails[0]['customer'],
+                    'issue' => $latestIssue > 0 ? ($latestIssue + 1) . "-{$this->itemDetails[0]['issue']}" : $this->itemDetails[0]['issue'],
+                    'po' => $this->itemDetails[0]['po'],
+                    'outpart' => $this->itemDetails[0]['outpart'],
+                    'quantity' => $this->itemDetails[0]['quantity'],
+                    'body' => $body ?? $baseBody,
+                ];
+                array_splice($this->itemDetails, 0, 1);
+            }          
         }
     }
-}
 
     public function createPlan()
     {
         $this->duplicateInput = false;
-        $currentDate = Carbon::now()->format('Ymd');
-        $latestRecord = Plandue::latest()->whereDate('created_at',$currentDate)->first();
-        $counter = $latestRecord ? (int) substr($latestRecord->plan_id, -4) + 1 : 1;
-        $counterFormatted = sprintf('%04d', $counter);
-        $customId = "DP-{$currentDate}-{$counterFormatted}";
-        
+
         if (count(array_column($this->itemDetails, 'issue')) !== count(array_unique(array_column($this->itemDetails, 'issue')))) {
             $this->duplicateInput = true;
         } 
         else {
-        
             $this->validate([
                 'itemDetails.*.duedate' => 'required|date',
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
@@ -285,38 +267,39 @@ class PlanCRUD extends Component
                 'itemDetails.*.quantity.exceeds_limit' => 'The quantity exceeds the maximum limit for the outpart.',
             ]);
         try{
-           $customer =  DB::connection('oracle')
+            $currentDate = Carbon::now()->format('Ymd');
+            $latestRecord = Plandue::latest()->whereDate('created_at',$currentDate)->first();
+            $counter = $latestRecord ? (int) substr($latestRecord->plan_id, -4) + 1 : 1;
+            $counterFormatted = sprintf('%04d', $counter);
+            $customId = "DP-{$currentDate}-{$counterFormatted}";
+            $customer =  DB::connection('oracle')
             ->select("SELECT 
             hca.account_number AS CUSTOMER_NUMBER,
             hp.party_name AS CUSTOMER_NAME,
             hcsu.price_list_id
-        FROM 
-            AR.hz_parties hp
-        JOIN 
-            AR.hz_cust_accounts hca ON hp.party_id = hca.party_id
-        LEFT JOIN 
-            AR.hz_cust_acct_sites_all hcas ON hca.cust_account_id = hcas.cust_account_id
-        LEFT JOIN 
-            AR.hz_party_sites hps ON hps.party_site_id = hcas.party_site_id
-        LEFT JOIN 
-            AR.hz_cust_site_uses_all hcsu ON hcas.cust_acct_site_id = hcsu.cust_acct_site_id
-        LEFT JOIN 
-            AR.hz_locations hl ON hps.location_id = hl.location_id
-        JOIN 
-            APPS.hr_operating_units hou ON hcas.org_id = hou.organization_id
-        WHERE 
-            hp.party_type = 'ORGANIZATION' 
-            AND hp.status = 'A' 
-            AND hps.status = 'A' 
-            AND hcas.org_id = 84 
-            AND hcsu.site_use_code = 'BILL_TO' 
-            AND hca.account_number = '{$this->itemDetails[0]['customer']}'
-        ORDER BY 
-            hp.party_name, hca.account_number") ?? null;
-        }catch (PDOException $e)
-        {
-            $customer = null;
-        }
+            FROM 
+                AR.hz_parties hp
+            JOIN 
+                AR.hz_cust_accounts hca ON hp.party_id = hca.party_id
+            LEFT JOIN 
+                AR.hz_cust_acct_sites_all hcas ON hca.cust_account_id = hcas.cust_account_id
+            LEFT JOIN 
+                AR.hz_party_sites hps ON hps.party_site_id = hcas.party_site_id
+            LEFT JOIN 
+                AR.hz_cust_site_uses_all hcsu ON hcas.cust_acct_site_id = hcsu.cust_acct_site_id
+            LEFT JOIN 
+                AR.hz_locations hl ON hps.location_id = hl.location_id
+            JOIN 
+                APPS.hr_operating_units hou ON hcas.org_id = hou.organization_id
+            WHERE 
+                hp.party_type = 'ORGANIZATION' 
+                AND hp.status = 'A' 
+                AND hps.status = 'A' 
+                AND hcas.org_id = 84 
+                AND hcsu.site_use_code = 'BILL_TO' 
+                AND hca.account_number = '{$this->itemDetails[0]['customer']}'
+            ORDER BY 
+                hp.party_name, hca.account_number") ?? null;
         
             $plan = Plandue::create([
                 'plan_id' => $customId,
@@ -328,7 +311,7 @@ class PlanCRUD extends Component
             foreach ($this->itemDetails as $item) {
                 $trupart = Part::where('customer',$item['customer'])->where('outpart',$item['outpart'])->first();
     
-                try{
+
                 $price_list = DB::connection('oracle')
                     ->select("SELECT 
                     hca.account_number AS CUSTOMER_NUMBER,
@@ -357,13 +340,10 @@ class PlanCRUD extends Component
                     AND hca.account_number = {$item['customer']}
                 ORDER BY 
                     hp.party_name, hca.account_number") ?? null;
-                } catch (PDOException $e){
-                    $price_list = null;
-                }
                
 
                 if (!empty($price_list)){
-                    try{
+                   
                     
                 $price = DB::connection('oracle')->select("SELECT
                     QSLH.NAME AS M_PRICE_CODE,
@@ -386,11 +366,6 @@ class PlanCRUD extends Component
                     AND QSLH.LIST_HEADER_ID = {$price_list[0] -> price_list_id}
                 ORDER BY
                     M_ITEM_CODE") ?? 0;
-                    } catch (PDOException $e){
-                        $price = null;
-                    }
-                    
-
                 }
                 // dd($item);
                 Listitem::create([
@@ -408,6 +383,12 @@ class PlanCRUD extends Component
             }
             $this->reset('itemDetails');
             $this->hideCreateModal();
+            session()->flash('success', 'Plan create successfully.');
+        }catch (\Exception $e)
+            {
+            $this->hideCreateModal();
+            session()->flash('error', 'An error occurred while create the plan.');  
+            }
         } 
     }
 
@@ -432,8 +413,15 @@ class PlanCRUD extends Component
 
     public function deleteData()
     {
-        Plandue::where('id', $this -> selectedPlan['id'])->delete();
-        $this->hideDeleteModal();
+        try{
+            Plandue::where('id', $this -> selectedPlan['id'])->delete();
+            $this->hideDeleteModal();
+            session()->flash('success', 'Plan delete successfully.');
+        }catch (\Exception $e){
+            $this->hideDeleteModal();
+            session()->flash('error', 'An error occurred while delete the plan.');  
+        }
+        
     }
 
     public $editItems; 
@@ -448,7 +436,6 @@ class PlanCRUD extends Component
     {   
         $this->editId = $id;
         $this->editItems = Listitem::select('id','customer','po','body','outpart','duedate','issue','quantity')->where('plandue_id',$id)->get();
-        // dd($this->editItems->toArray());
         if(!empty($this->editItems))
         {
             foreach($this->editItems as $editItem)
@@ -457,101 +444,97 @@ class PlanCRUD extends Component
             }
         }
         $this->countEditItems = count($this->editItemDetails);
-
-
         $this->showEditModal = true;
     }
     
     public function editPlan()
-        {
-            $this->duplicateInput = false;
-            if (count(array_column($this->editItemDetails, 'issue')) !== count(array_unique(array_column($this->editItemDetails, 'issue')))) {
+    {
+        $this->duplicateInput = false;
+        if (count(array_column($this->editItemDetails, 'issue')) !== count(array_unique(array_column($this->editItemDetails, 'issue')))) {
             $this->duplicateInput = true;
-            } 
+        } 
 
-                foreach($this->editItemDetails as $index  => $item)           
-                $this->validate([
-                    "editItemDetails.$index.duedate" => "required|date",
-                    "editItemDetails.$index.customer" => ["required","string",Rule::exists('parts','customer')],
-                    "editItemDetails.$index.issue" => ['required','string',
-                    function ($attribute, $value,$fail){
-                        $index = explode('.', $attribute)[1];
-                        $customer = $this->itemDetails[$index]['customer'];
-                        $issue = $this->itemDetails[$index]['issue'];
+        foreach($this->editItemDetails as $index  => $item)
+        // dd($this->editItemDetails[$index]['customer']);           
+            $this->validate([
+                "editItemDetails.$index.duedate" => "required|date",
+                "editItemDetails.$index.customer" => ["required","string",Rule::exists('parts','customer')],
+                "editItemDetails.$index.issue" => ['required','string',
+                function ($attribute, $value,$fail){
+                    $index = explode('.', $attribute)[1];
+                    $customer = $this->editItemDetails[$index]['customer'];
+                    $issue = $this->editItemDetails[$index]['issue'];
 
-                        if(Listitem::where('customer', $customer)->where('issue', $issue)->exists()){
-                            $fail("The issue is duplicate");
-                        }
-                    }],
-                    "editItemDetails.$index.po" => 'required',
-                    "editItemDetails.$index.outpart" => ['required','string',
-                    function ($attribute, $value, $fail){
-                        $index = explode('.', $attribute)[1];
-                        $customer = $this->itemDetails[$index]['customer'];
-                        $outpart = $this->itemDetails[$index]['outpart'];
+                    if(Listitem::where('customer', $customer)->where('issue', $issue)->where('id', '!=', $this->editItemDetails[$index]['id'])->exists()){
+                        $fail("The issue is duplicate");
+                    }
+                }],
+                "editItemDetails.$index.po" => 'required',
+                "editItemDetails.$index.outpart" => ['required','string',
+                function ($attribute, $value, $fail){
+                    $index = explode('.', $attribute)[1];
+                    $customer = $this->editItemDetails[$index]['customer'];
+                    $outpart = $this->editItemDetails[$index]['outpart'];
             
                         // Check if the combination of customer and outpart exists in the parts table
-                        if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
-                            $fail("The outpart '$outpart' does not exist for customer '$customer'.");
-                        }
+                    if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
+                        $fail("The outpart '$outpart' does not exist for customer '$customer'.");
                     }
-                    ],
-                    "editItemDetails.$index.quantity" => "required|numeric",
-                    ],[
-                    "editItemDetails.$index.duedate.required" => "DueDate is required.",
-                    "editItemDetails.$index.duedate.date" => 'Date must be valid date.',
-                    "editItemDetails.$index.issue.required" => 'Issue field is required.',
-                    "editItemDetails.$index.issue.unique" => 'Issue must be unique.',
-                    "editItemDetails.$index.outpart.required" => 'Outpart field is required.',
-                    "editItemDetails.$index.outpart.exists" => 'Outpart does not exist.',
-                    "editItemDetails.$index.quantity.required" => 'Quantity field is required.',
-                    "editItemDetails.$index.quantity.numeric" => 'Quantity must be numeric.',
-                    ]);  
-                 
-                // dd($test);                                
-            // }
-            
-            if(!empty($this->deleteItem))
-            {   
-                foreach($this->deleteItem as $deleteI)
-                    {
-                        Listitem::where('id',$deleteI['id'])->delete();
-                    }
-            }
-
-            foreach($this->editItemDetails as $updateItem)
-                {
-                    if(empty($updateItem['id']))
-                    {
-                       break;
-                    } 
-                    Listitem::where('id', $updateItem['id'])->update([
-                            'duedate' => $updateItem['duedate'],
-                            'customer' => $updateItem['customer'],
-                            'issue' => $updateItem['issue'],
-                            'po' => $updateItem['po'],
-                            'outpart'=>$updateItem['outpart'],
-                            'quantity'=>$updateItem['quantity'],
-                            'body' =>$updateItem['body'],
-                            'updated_by' => auth()->id(),
-                        ]);
                 }
-            foreach(array_reverse($this->editItemDetails) as $createInUpdate)
-            {
-                if(!empty($createInUpdate['id']))
-                    {
-                        break;
-                    }
+                ],
+                "editItemDetails.$index.quantity" => "required|numeric",
+                ],[
+                "editItemDetails.$index.duedate.required" => "DueDate is required.",
+                "editItemDetails.$index.duedate.date" => 'Date must be valid date.',
+                "editItemDetails.$index.issue.required" => 'Issue field is required.',
+                "editItemDetails.$index.issue.unique" => 'Issue must be unique.',
+                "editItemDetails.$index.outpart.required" => 'Outpart field is required.',
+                "editItemDetails.$index.outpart.exists" => 'Outpart does not exist.',
+                "editItemDetails.$index.quantity.required" => 'Quantity field is required.',
+                "editItemDetails.$index.quantity.numeric" => 'Quantity must be numeric.',
+                ]);  
+        // try{                  
+        if(!empty($this->deleteItem)){   
+            foreach($this->deleteItem as $deleteI){
+                Listitem::where('id',$deleteI['id'])->delete();
+            }
+        }
+
+        foreach($this->editItemDetails as $updateItem){
+            Listitem::where('id', $updateItem['id'])->update([
+                'duedate' => $updateItem['duedate'],
+                'customer' => $updateItem['customer'],
+                'issue' => $updateItem['issue'],
+                'po' => $updateItem['po'],
+                'outpart'=>$updateItem['outpart'],
+                'quantity'=>$updateItem['quantity'],
+                'body' =>$updateItem['body'],
+                'updated_by' => auth()->id(),
+                ]);
+            }
+            foreach(array_reverse($this->editItemDetails) as $createInUpdate){
+                if(!empty($createInUpdate['id'])){
+                    break;
+                }
                 Listitem::create([
                     'plandue_id' => $this->editId,
                     'created_by' => auth()->id(),
                     'duedate' => $createInUpdate['duedate'],
+                    'customer' => $createInUpdate['customer'],
                     'issue' => $createInUpdate['issue'],
+                    'po' => $createInUpdate['po'],
                     'outpart' => $createInUpdate['outpart'],
                     'quantity' => $createInUpdate['quantity'],
+                    'body' =>$createInUpdate['body'],
                 ]);
             }
-        }
+            $this->hideEditModal();
+            session()->flash('success', 'Plan edit successfully.');
+        // }catch (\Exception $e){
+        //     $this->hideEditModal();
+        //     session()->flash('error', 'An error occurred while edit the plan.'); 
+        // }
+    }
 
     public function editRemove($index)
     {
@@ -567,7 +550,7 @@ class PlanCRUD extends Component
     public function editAdd()
     {
         
-        $this->editItemDetails[] = ['id'=> '','duedate' => '', 'issue' => '', 'outpart' => '', 'quantity' => ''];
+        $this->editItemDetails[] = ['id'=> '','duedate' => '', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '','body' => ''];
         $this->countEditItems = count($this->editItemDetails);
     }
 
