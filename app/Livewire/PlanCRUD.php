@@ -19,8 +19,10 @@ class PlanCRUD extends Component
 {
     use WithFileUploads;
     public $showCreateModal = false;
+    public $duedate;
+    public $car;
     public $itemDetails = [
-        ['duedate' => '','customer'=>'', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '', 'body' => ''],
+        ['customer'=>'', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '', 'body' => '','ship_to'=>''],
     ];
     public $getOutpartSuggestions;
 
@@ -44,23 +46,23 @@ class PlanCRUD extends Component
 
         foreach ($data[0] as $row) {
         if($row[0] !== 'duedate'){     
-            $duedate = $row[0];
-            $customer = $row[1];
-            $issue = $row[2];
-            $po = $row[3];
-            $outpart = $row[4];
-            $quantity = $row[5];
-            $body = $row[6];
+            $customer = $row[0];
+            $issue = $row[1];
+            $po = $row[2];
+            $outpart = $row[3];
+            $quantity = $row[4];
+            $body = $row[5];
+            $ship_to = $row[6];
         
             
             $itemDetails = [
-                'duedate' => $duedate,
                 'customer' => $customer,
                 'issue' => $issue,
                 'po' => $po,
                 'outpart' => $outpart,
                 'quantity' => $quantity,
                 'body' => $body,
+                'ship_to' => $ship_to,
             ];
 
             $itemDetailsArray[] = $itemDetails;
@@ -106,7 +108,7 @@ class PlanCRUD extends Component
 
     public function addItem()
     {
-        $this->itemDetails[] = ['duedate' => '','customer'=>'', 'issue' => '','po'=> '', 'outpart' => '', 'quantity' => '','body' => ''];
+        $this->itemDetails[] = ['customer'=>'', 'issue' => '','po'=> '', 'outpart' => '', 'quantity' => '','body' => '','ship_to'=>''];
     }
 
     public function clearItem()
@@ -125,7 +127,8 @@ class PlanCRUD extends Component
     public function checkQuantity()
     {
         $this->validate([
-        'itemDetails.*.duedate' => 'required|date',
+        'duedate' => 'required|date',
+        'car' => 'required',
         'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
         'itemDetails.*.issue' => 'required|string',
         'itemDetails.*.outpart' => ['required',
@@ -142,8 +145,9 @@ class PlanCRUD extends Component
         'itemDetails.*.quantity' => 'required|numeric',
         ],
         [
-        'itemDetails.*.duedate.required' => 'DueDate is required.',
-        'itemDetails.*.duedate.date' => 'Date must be a valid date.',
+        'duedate.required' => 'DueDate is required.',
+        'duedate.date' => 'Date must be a valid date.',
+        'car.required' => 'DueDate is required.',
         'itemDetails.*.customer.required' => 'Customer is required.',
         'itemDetails.*.customer.required' => 'Customer does not exist.',        
         'itemDetails.*.outpart.required' => 'Outpart field is required.',
@@ -169,13 +173,13 @@ class PlanCRUD extends Component
                         $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
                     }
                     $this->itemDetails[] = [
-                        'duedate' => $this->itemDetails[0]['duedate'],
                         'customer' => $this->itemDetails[0]['customer'],
                         'issue' => "{$count}-{$this->itemDetails[0]['issue']}",
                         'po' => $this->itemDetails[0]['po'],
                         'outpart' => $this->itemDetails[0]['outpart'],
                         'quantity' => $quantityToAdd,
                         'body' => $body ?? $baseBody,
+                        'ship_to' => $this->itemDetails[0]['ship_to'],
                     ];
                     $checkIssue['quantity'] -= $quantityToAdd;
                     if (is_numeric($baseBody))
@@ -192,13 +196,13 @@ class PlanCRUD extends Component
                     $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
                 }
                 $this->itemDetails[] = [
-                    'duedate' => $this->itemDetails[0]['duedate'],
                     'customer' => $this->itemDetails[0]['customer'],
                     'issue' => $latestIssue > 0 ? ($latestIssue + 1) . "-{$this->itemDetails[0]['issue']}" : $this->itemDetails[0]['issue'],
                     'po' => $this->itemDetails[0]['po'],
                     'outpart' => $this->itemDetails[0]['outpart'],
                     'quantity' => $this->itemDetails[0]['quantity'],
                     'body' => $body ?? $baseBody,
+                    'ship_to' => $this->itemDetails[0]['ship_to'],
                 ];
                 array_splice($this->itemDetails, 0, 1);
             }          
@@ -214,7 +218,8 @@ class PlanCRUD extends Component
         } 
         else {
             $this->validate([
-                'itemDetails.*.duedate' => 'required|date',
+                'duedate' => 'required|date',
+                'car' => 'required|in:4W,6W,Trailer,Staion',
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
                 'itemDetails.*.issue' => ['required','string',
                 function ($attribute, $value,$fail){
@@ -255,8 +260,11 @@ class PlanCRUD extends Component
                     }
                 },] ,
             ],[
-                'itemDetails.*.duedate.required' => 'DueDate is required.',
-                'itemDetails.*.duedate.date' => 'Date must be valid date.',
+                'duedate.required' => 'DueDate is required.',
+                'duedate.date' => 'Date must be a valid date.',
+                'car.required' => 'DueDate is required.',
+                'itemDetails.*.customer.required' => 'Customer field is required.',
+                'itemDetails.*.customer.exists' => 'Customer does not exist.',
                 'itemDetails.*.issue.required' => 'Issue field is required.',
                 'itemDetails.*.issue.unique' => 'Issue must be unique.',
                 'itemDetails.*.po.required' => 'PO field is required.',
@@ -266,7 +274,7 @@ class PlanCRUD extends Component
                 'itemDetails.*.quantity.numeric' => 'Quantity must be numeric.',
                 'itemDetails.*.quantity.exceeds_limit' => 'The quantity exceeds the maximum limit for the outpart.',
             ]);
-        try{
+        // try{
             $currentDate = Carbon::now()->format('Ymd');
             $latestRecord = Plandue::latest()->whereDate('created_at',$currentDate)->first();
             $counter = $latestRecord ? (int) substr($latestRecord->plan_id, -4) + 1 : 1;
@@ -305,6 +313,8 @@ class PlanCRUD extends Component
                 'plan_id' => $customId,
                 'status' => 'pending',
                 'company_name' => $customer[0]->customer_name ?? null,
+                'duedate' => $this->duedate,
+                'car' => $this->car,
                 'created_by' => auth()->id(),
             ]);
 
@@ -371,7 +381,6 @@ class PlanCRUD extends Component
                 Listitem::create([
                     'plandue_id' => $plan->id,
                     'created_by' => auth()->id(),
-                    'duedate' => $item['duedate'],
                     'customer' => $item['customer'],
                     'issue' => $item['issue'],
                     'po' => $item['po'],
@@ -379,16 +388,17 @@ class PlanCRUD extends Component
                     'prize'=>  $item['quantity'] * ($price[0]->operand ?? 0) ?? null,
                     'quantity' => $item['quantity'],
                     'body' => $item['body'],
+                    'ship_to' => $item['ship_to'],
                 ]);
             }
             $this->reset('itemDetails');
             $this->hideCreateModal();
             session()->flash('success', 'Plan create successfully.');
-        }catch (\Exception $e)
-            {
-            $this->hideCreateModal();
-            session()->flash('error', 'An error occurred while create the plan.');  
-            }
+        // }catch (\Exception $e)
+        //     {
+        //     $this->hideCreateModal();
+        //     session()->flash('error', 'An error occurred while create the plan.');  
+        //     }
         } 
     }
 
@@ -429,18 +439,26 @@ class PlanCRUD extends Component
     public $editItemDetails=[];
     public $editId;
     public $countEditItems;
-
+    public $eDuedate;
+    public $eCar;
     public $deleteItem;
 
     public function openEditModal($id)
     {   
         $this->editId = $id;
-        $this->editItems = Listitem::select('id','customer','po','body','outpart','duedate','issue','quantity')->where('plandue_id',$id)->get();
+        $this->editItems = Plandue::where('id',$this->editId)->with('listitems')->get();
+        // dd($this->editItems->listitems);
+        // $this->editItems = Listitem::select('id','customer','po','body','outpart','duedate','prize','issue','quantity','ship_to')->where('plandue_id',$id)->get();
         if(!empty($this->editItems))
         {
-            foreach($this->editItems as $editItem)
+            foreach($this->editItems as $editItem)   
             {
-            $this->editItemDetails[] = ['id'=>$editItem->id ,'customer' => $editItem->customer, 'duedate' => $editItem->duedate , 'issue' => $editItem->issue,'po' => $editItem->po, 'outpart' => $editItem->outpart, 'quantity' =>$editItem->quantity, 'body'=>$editItem->body];
+                $this->eDuedate = $editItem->duedate;
+                $this->eCar = $editItem->car;
+                foreach($editItem->listitems as $editItem)
+                {
+                $this->editItemDetails[] = ['id'=>$editItem->id ,'customer' => $editItem->customer, 'duedate' => $editItem->duedate , 'issue' => $editItem->issue,'po' => $editItem->po, 'outpart' => $editItem->outpart, 'quantity' =>$editItem->quantity,'prize'=>$editItem->prize, 'body'=>$editItem->body,'ship_to'=>$editItem->ship_to];
+                }
             }
         }
         $this->countEditItems = count($this->editItemDetails);
@@ -457,7 +475,8 @@ class PlanCRUD extends Component
         foreach($this->editItemDetails as $index  => $item)
         // dd($this->editItemDetails[$index]['customer']);           
             $this->validate([
-                "editItemDetails.$index.duedate" => "required|date",
+                'eDuedate' => 'required|date',
+                'eCar' => 'required|in:4W,6W,Trailer,Staion',
                 "editItemDetails.$index.customer" => ["required","string",Rule::exists('parts','customer')],
                 "editItemDetails.$index.issue" => ['required','string',
                 function ($attribute, $value,$fail){
@@ -483,15 +502,19 @@ class PlanCRUD extends Component
                 }
                 ],
                 "editItemDetails.$index.quantity" => "required|numeric",
+                "editItemDetails.$index.outpart" => "required|numeric"
                 ],[
-                "editItemDetails.$index.duedate.required" => "DueDate is required.",
-                "editItemDetails.$index.duedate.date" => 'Date must be valid date.',
+                'eDuedate.required' => 'DueDate is required.',
+                'eDuedate.date' => 'Date must be a valid date.',
+                'eCar.required' => 'Car is required.',
+                'eCar.in' => 'Car value worng.',
                 "editItemDetails.$index.issue.required" => 'Issue field is required.',
                 "editItemDetails.$index.issue.unique" => 'Issue must be unique.',
                 "editItemDetails.$index.outpart.required" => 'Outpart field is required.',
                 "editItemDetails.$index.outpart.exists" => 'Outpart does not exist.',
                 "editItemDetails.$index.quantity.required" => 'Quantity field is required.',
                 "editItemDetails.$index.quantity.numeric" => 'Quantity must be numeric.',
+                "editItemDetails.$index.prize.numeric" => 'Quantity must be numeric.',
                 ]);  
         // try{                  
         if(!empty($this->deleteItem)){   
@@ -502,13 +525,14 @@ class PlanCRUD extends Component
 
         foreach($this->editItemDetails as $updateItem){
             Listitem::where('id', $updateItem['id'])->update([
-                'duedate' => $updateItem['duedate'],
                 'customer' => $updateItem['customer'],
                 'issue' => $updateItem['issue'],
                 'po' => $updateItem['po'],
                 'outpart'=>$updateItem['outpart'],
                 'quantity'=>$updateItem['quantity'],
+                'prize'=>$updateItem['prize'],
                 'body' =>$updateItem['body'],
+                'ship_to' =>$updateItem['ship_to'],
                 'updated_by' => auth()->id(),
                 ]);
             }
@@ -519,7 +543,7 @@ class PlanCRUD extends Component
                 Listitem::create([
                     'plandue_id' => $this->editId,
                     'created_by' => auth()->id(),
-                    'duedate' => $createInUpdate['duedate'],
+                    
                     'customer' => $createInUpdate['customer'],
                     'issue' => $createInUpdate['issue'],
                     'po' => $createInUpdate['po'],
@@ -529,7 +553,7 @@ class PlanCRUD extends Component
                 ]);
             }
             $this->hideEditModal();
-            session()->flash('success', 'Plan edit successfully.');
+            // session()->flash('success', 'Plan edit successfully.');
         // }catch (\Exception $e){
         //     $this->hideEditModal();
         //     session()->flash('error', 'An error occurred while edit the plan.'); 
@@ -549,8 +573,7 @@ class PlanCRUD extends Component
     }
     public function editAdd()
     {
-        
-        $this->editItemDetails[] = ['id'=> '','duedate' => '', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '','body' => ''];
+        $this->editItemDetails[] = ['id'=> '','customer'=>'' ,'issue' => '','po' => '', 'outpart' => '', 'quantity' => '','prize' => '','body' => '','ship_to'=>''];
         $this->countEditItems = count($this->editItemDetails);
     }
 

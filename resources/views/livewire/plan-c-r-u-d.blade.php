@@ -92,7 +92,10 @@
                                                 </th> 
                                                 <th scope="col" class="px-6 py-3">
                                                     Body
-                                                </th>                                           
+                                                </th>
+                                                <th scope="col" class="px-6 py-3">
+                                                    Ship To
+                                                </th>                                             
                                             </tr>
                                         </thead>
                                         @foreach ($pland->listitems as $listitem)
@@ -102,7 +105,7 @@
                                                 </th>
                                                 
                                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                                    {{ $listitem->duedate }}
+                                                    {{ $pland->duedate }}
                                                 </th>
                                                 <td class="px-6 py-4">
                                                     {{ $listitem->issue }}
@@ -121,6 +124,9 @@
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     {{ $listitem->body }}
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    {{ $listitem->ship_to }}
                                                 </td>
                                                 {{-- <td class="px-6 py-4">
                                                     {{ optional($part->createdBy)->name }}
@@ -158,6 +164,32 @@
                 </svg>
             </button>
         </div>
+        <div class="bg-gray-100 w-full flex justify-between p-4">
+            <div class="flex">
+                <div class="w-48">
+                    <label for="due" class="text-xs">Due Date</label>
+                    <input id="due" wire:model="duedate" type="datetime-local" class="w-full p-2 border border-gray-300 text-xs rounded" required /> 
+                    @error('duedate') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="car" class="text-xs">Car</label>
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "car" wire:model="car"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option value="">All</option>
+                            <option value="4W">4W</option>    
+                            <option value="6W">6W</option>    
+                            <option value="Trailer">Trailer</option>    
+                            <option value="Station">Station</option>     
+                        </select>
+                    @error('car') 
+                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>   
+            </div>
+        </div> 
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
             <div>
                 @if($duplicateInput)
@@ -166,24 +198,19 @@
                 <table class="mt-4 max-w-8xl text-sm text-left rtl:text-right text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3">Due Date</th>
                             <th scope="col" class="px-6 py-3">Customer Id.</th>
                             <th scope="col" class="px-6 py-3">Issue/serial/lot/line</th>
                             <th scope="col" class="px-6 py-3">PO.</th>
                             <th scope="col" class="px-6 py-3">Outside part No.</th>
                             <th scope="col" class="px-6 py-3">Quantity</th>
                             <th scope="col" class="px-6 py-3">Body</th>
+                            <th scope="col" class="px-6 py-3">Ship To</th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($itemDetails as $rowIndex => $row)
                         <tr>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.duedate') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
                             <td class="px-6" >
                                 @error('itemDetails.' . $rowIndex . '.customer') 
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
@@ -214,12 +241,13 @@
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
                             </td>
+                            <td class="px-6" >
+                                @error('itemDetails.' . $rowIndex . '.ship_to') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
                         </tr>
                             <tr class="bg-white border-b hover:bg-gray-50">
-                                
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="itemDetails.{{ $rowIndex }}.duedate" type="datetime-local" class="w-full p-2 border border-gray-300 text-xs rounded" required />
-                                    </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="itemDetails.{{ $rowIndex }}.customer" type="text" class="w-full p-2 border border-gray-300 rounded text-sm"  />
                                     </td>
@@ -239,6 +267,9 @@
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="itemDetails.{{ $rowIndex }}.body" type="text" class="w-full p-2 border border-gray-300 text-sm rounded" />     
                                     </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.ship_to" type="text" class="w-full p-2 border border-gray-300 text-sm rounded" />     
+                                    </td>
                                 
                                 <td class="px-6 py-4">
                                     <button type="button" wire:click="removeItem({{ $rowIndex }})" class="text-red-500 focus:outline-none">
@@ -254,7 +285,7 @@
                 </table>
             </div>      
         </div>
-        <button type="button" wire:click="addItem" class="mt-2 text-white bg-green-500 hover:bg-green-600 font-medium rounded-lg text-sm px-4 py-2">Add Item</button>    
+    <button type="button" wire:click="addItem" class="mt-2 text-white bg-green-500 hover:bg-green-600 font-medium rounded-lg text-sm px-4 py-2">Add Item</button>   
     <div class="bg-gray-100 w-full flex justify-between p-4">
         <div class="flex">
         <button type="button" wire:click="clearItem" class="text-white bg-slate-700 hover:bg-slate-800 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5">Clear</button>
@@ -328,6 +359,32 @@
                 </svg>
             </button>
         </div>
+        <div class="bg-gray-100 w-full flex justify-between p-4">
+            <div class="flex">
+                <div class="w-48">
+                    <label for="due" class="text-xs">Due Date</label>
+                    <input id="due" wire:model="eDuedate" type="datetime-local" class="w-full p-2 border border-gray-300 text-xs rounded" required /> 
+                    @error('duedate') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="car" class="text-xs">Car</label>
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "car" wire:model="eCar"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option value="">All</option>
+                            <option value="4W">4W</option>    
+                            <option value="6W">6W</option>    
+                            <option value="Trailer">Trailer</option>    
+                            <option value="Station">Station</option>    
+                        </select>
+                    @error('car') 
+                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>   
+            </div>
+        </div>
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">        
             <div>
             @if($duplicateInput)
@@ -336,24 +393,21 @@
                 <table class="mt-4 max-w-7xl text-sm text-left rtl:text-right text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3">Due Date</th>
+                            
                             <th scope="col" class="px-6 py-3">Customer</th>
                             <th scope="col" class="px-6 py-3">Issue/serial/lot/line</th>
                             <th scope="col" class="px-6 py-3">PO.</th>
                             <th scope="col" class="px-6 py-3">Outside part No.</th>
                             <th scope="col" class="px-6 py-3">Quantity</th>
+                            <th scope="col" class="px-6 py-3">Price</th>
                             <th scope="col" class="px-6 py-3">Body</th>
+                            <th scope="col" class="px-6 py-3">Ship To</th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($editItemDetails as $rowIndex => $row)
                         <tr>
-                            <td class="px-6" >
-                                @error('editItemDetails.' . $rowIndex . '.duedate') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
                             <td class="px-6" >
                                 @error('editItemDetails.' . $rowIndex . '.customer') 
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
@@ -380,15 +434,23 @@
                                 @enderror 
                             </td>
                             <td class="px-6" >
+                                @error('editItemDetails.' . $rowIndex . '.prize') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
+                            <td class="px-6" >
                                 @error('editItemDetails.' . $rowIndex . '.body') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
+                            </td>
+                            <td class="px-6" >
+                                @error('editItemDetails.' . $rowIndex . '.ship_to') 
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
                             </td>
                         </tr>
                             <tr class="bg-white border-b hover:bg-gray-50">                                
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editItemDetails.{{ $rowIndex }}.duedate" type="datetime-local" class="w-full p-2 border border-gray-300 rounded text-sm" required />
-                                    </td>
+                        
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="editItemDetails.{{ $rowIndex }}.customer" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />
                                     </td>
@@ -405,7 +467,13 @@
                                         <input wire:model="editItemDetails.{{ $rowIndex }}.quantity" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />     
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.prize" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />     
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="editItemDetails.{{ $rowIndex }}.body" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" />     
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.ship_to" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />     
                                     </td>                                  
                                 <td class="px-6 py-4">
                                     <button type="button" wire:click="editRemove({{ $rowIndex }})" class="text-red-500 focus:outline-none">

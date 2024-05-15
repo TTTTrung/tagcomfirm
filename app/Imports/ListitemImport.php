@@ -13,13 +13,13 @@ class ListitemImport implements ToCollection
     public function collection(Collection $rows)
     {         
            return [
-                'duedate' => $rows[0],
-                'customer' => $rows[1],
-                'issue' => $rows[2],
-                'po' => $rows[3],
-                'outpart' => $rows[4],
-                'quantity' => $rows[5],
-                'body' => $rows[6],
+                'customer' => $rows[0],
+                'issue' => $rows[1],
+                'po' => $rows[2],
+                'outpart' => $rows[3],
+                'quantity' => $rows[4],
+                'body' => $rows[5],
+                'ship_to' =>$rows[6]
            ];        
     }
 }

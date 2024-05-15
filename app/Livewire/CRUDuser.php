@@ -80,12 +80,7 @@ class CRUDuser extends Component
         foreach($this->selectedUser->getRoleNames() as $role){
             $this->edSelectedRoles = $role;
         }
-    
-        }
-        
-        
-        
-        
+        }   
     }
     public function hideEditModal()
     {

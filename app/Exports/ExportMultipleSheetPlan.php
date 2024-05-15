@@ -51,7 +51,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
            
             public function headings(): array
             {
-                return ['Due date', 'Customer', 'Part No.', 'Part name', 'Quantity', 'Issue/serial/lot/line','PO.', 'JOB', 'Weight','Width*Long*Height', 'Remark','Body'];
+                return ['Due date', 'Customer', 'Part No.', 'Part name', 'Quantity', 'Issue/serial/lot/line','PO.', 'JOB', 'Weight','Width*Long*Height', 'Remark','Body','Ship to'];
             }
 
             public function startCell(): string
@@ -62,7 +62,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
             public function styles(Worksheet $sheet)
             { 
                 $sheet->getStyle(6)->getFont()->setBold(true);
-                $sheet->getStyle('A6:L6')->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle('A6:M6')->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getRowDimension('6')->setRowHeight(20);
                 $sheet->getColumnDimension('A')->setWidth(18);
                 $sheet->getColumnDimension('B')->setWidth(20);
@@ -76,7 +76,8 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getColumnDimension('J')->setWidth(20);
                 $sheet->getColumnDimension('K')->setWidth(20);
                 $sheet->getColumnDimension('L')->setWidth(15);
-            
+                $sheet->getColumnDimension('M')->setWidth(12);
+
                 
                 $sheet->setShowGridlines(false);
                 $sheet->setCellValue('A2','PlanDue ID :');
@@ -90,7 +91,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 foreach($this->test as $t)
                 {
                     $weight = Part::where('outpart',$t->outpart)->first();
-                    $sheet->setCellValue("A{$currentRow}",$t->duedate);
+                    $sheet->setCellValue("A{$currentRow}",$this->data->duedate);
                     $sheet->setCellValue("B{$currentRow}",$weight->type ?? null);
                     $sheet->setCellValue("C{$currentRow}",$t->outpart);
                     $sheet->setCellValue("D{$currentRow}",$weight->partname ?? null);
@@ -102,8 +103,9 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->setCellValue("J{$currentRow}",$weight->pl_size);
                     $sheet->setCellValue("K{$currentRow}",'');
                     $sheet->setCellValue("L{$currentRow}",$t->body);
+                    $sheet->setCellValue("M{$currentRow}",$t->ship_to);
 
-                    for ($col = 'A'; $col <= 'L'; $col++) {
+                    for ($col = 'A'; $col <= 'M'; $col++) {
                         $sheet->getStyle("{$col}{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                         $sheet->getStyle("{$col}{$currentRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                         $sheet->getStyle("{$col}{$currentRow}")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
@@ -193,9 +195,10 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->setCellValue("B".($count + 3), $this->data->company_name);
 
                     $sheet->setCellValue("A".($count + 4),'Delivery');
-                    $sheet->setCellValue("B".($count + 4),$tt->duedate);
+                    $sheet->setCellValue("B".($count + 4),$this->data->duedate);
 
-                    $sheet->setCellValue("A".($count + 5),'Due');
+                    $sheet->setCellValue("A".($count + 5),'Ship to');
+                    $sheet->setCellValue("B".($count + 5),$tt->ship_to);
 
                     $sheet->setCellValue("A".($count + 7),'QTY');
                     $sheet->mergeCells("B" . ($count + 6) . ":C" . ($count + 8));
@@ -262,7 +265,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->setCellValue('M1',$this->test2->name);
                 $sheet->getStyle("M1")->getFont()->setSize(15);
                 $sheet->mergeCells("K2:N3");
-                $sheet->setCellValue('K2',$this->test->first()->duedate);
+                $sheet->setCellValue('K2',"{$this->data->duedate}"."  Car: "."{$this->data->car}");
                 $sheet->getStyle("K2")->getFont()->setSize(20);
                 $styleArray = [
                     'borders' => [

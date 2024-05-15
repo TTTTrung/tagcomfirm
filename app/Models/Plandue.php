@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Plandue extends Model
 {
     use HasFactory;
-    protected $fillable = ['plan_id', 'status', 'created_by','company_name'];
+    protected $fillable = ['plan_id', 'status','duedate','car','created_by','company_name'];
 
     public function createBy():BelongsTo
     {
