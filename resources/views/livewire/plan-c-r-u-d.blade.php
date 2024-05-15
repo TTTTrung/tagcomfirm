@@ -473,7 +473,7 @@
                                         <input wire:model="editItemDetails.{{ $rowIndex }}.body" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" />     
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editItemDetails.{{ $rowIndex }}.ship_to" type="text" class="w-full p-2 border border-gray-300 rounded text-sm" required />     
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.ship_to" type="text" class="w-full p-2 border border-gray-300 rounded text-sm"  />     
                                     </td>                                  
                                 <td class="px-6 py-4">
                                     <button type="button" wire:click="editRemove({{ $rowIndex }})" class="text-red-500 focus:outline-none">

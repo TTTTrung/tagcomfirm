@@ -274,7 +274,7 @@ class PlanCRUD extends Component
                 'itemDetails.*.quantity.numeric' => 'Quantity must be numeric.',
                 'itemDetails.*.quantity.exceeds_limit' => 'The quantity exceeds the maximum limit for the outpart.',
             ]);
-        // try{
+         try{
             $currentDate = Carbon::now()->format('Ymd');
             $latestRecord = Plandue::latest()->whereDate('created_at',$currentDate)->first();
             $counter = $latestRecord ? (int) substr($latestRecord->plan_id, -4) + 1 : 1;
@@ -394,11 +394,11 @@ class PlanCRUD extends Component
             $this->reset('itemDetails');
             $this->hideCreateModal();
             session()->flash('success', 'Plan create successfully.');
-        // }catch (\Exception $e)
-        //     {
-        //     $this->hideCreateModal();
-        //     session()->flash('error', 'An error occurred while create the plan.');  
-        //     }
+        }catch (\Exception $e)
+            {
+            $this->hideCreateModal();
+            session()->flash('error', 'An error occurred while create the plan.');  
+            }
         } 
     }
 
@@ -516,7 +516,13 @@ class PlanCRUD extends Component
                 "editItemDetails.$index.quantity.numeric" => 'Quantity must be numeric.',
                 "editItemDetails.$index.prize.numeric" => 'Quantity must be numeric.',
                 ]);  
-        // try{                  
+        try{
+        
+            Plandue::where('id',$this->editId)->update([
+                'duedate' => $this->eDuedate,
+                'car' => $this->eCar,
+            ]);
+            
         if(!empty($this->deleteItem)){   
             foreach($this->deleteItem as $deleteI){
                 Listitem::where('id',$deleteI['id'])->delete();
@@ -553,11 +559,11 @@ class PlanCRUD extends Component
                 ]);
             }
             $this->hideEditModal();
-            // session()->flash('success', 'Plan edit successfully.');
-        // }catch (\Exception $e){
-        //     $this->hideEditModal();
-        //     session()->flash('error', 'An error occurred while edit the plan.'); 
-        // }
+            session()->flash('success', 'Plan edit successfully.');
+        }catch (\Exception $e){
+            $this->hideEditModal();
+            session()->flash('error', 'An error occurred while edit the plan.'); 
+        }
     }
 
     public function editRemove($index)
