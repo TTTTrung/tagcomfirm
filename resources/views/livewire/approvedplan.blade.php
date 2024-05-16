@@ -81,7 +81,10 @@
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 Body
-                            </th>                                            
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Ship to
+                            </th>                                             
                         </tr>
                     </thead>
                     @foreach ($pland->listitems as $listitem)
@@ -91,7 +94,7 @@
                             </th>
                             
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                {{ $listitem->duedate }}
+                                {{ $pland->duedate }}
                             </th>
                             <td class="px-6 py-4">
                                 {{ $listitem->issue }}
@@ -111,6 +114,9 @@
                             </td>
                             <td class="px-6 py-4">
                                 {{ $listitem->body }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $listitem->ship_to }}
                             </td>
                         </tr>   
                     @endforeach
