@@ -45,14 +45,14 @@ class PlanCRUD extends Component
         $this->itemDetails = array_fill_keys($headers, '');
 
         foreach ($data[0] as $row) {
-        if($row[0] !== 'duedate'){     
-            $customer = $row[0];
-            $issue = $row[1];
-            $po = $row[2];
-            $outpart = $row[3];
-            $quantity = $row[4];
-            $body = $row[5];
-            $ship_to = $row[6];
+        if($row[0] !== 'CUSTOMER ID.'){     
+            $customer = $row[0] ?? null;
+            $issue = $row[1] ?? null;
+            $po = $row[2] ?? null;
+            $outpart = $row[3] ?? null;
+            $quantity = $row[4] ?? null;
+            $body = $row[5] ?? null;
+            $ship_to = $row[6] ?? null;
         
             
             $itemDetails = [
@@ -615,6 +615,7 @@ class PlanCRUD extends Component
             ]);
         $this->hideApproveModal();
     }
+
     
 
 
