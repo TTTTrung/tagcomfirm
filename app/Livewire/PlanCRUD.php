@@ -502,7 +502,6 @@ class PlanCRUD extends Component
                 }
                 ],
                 "editItemDetails.$index.quantity" => "required|numeric",
-                "editItemDetails.$index.outpart" => "required|numeric"
                 ],[
                 'eDuedate.required' => 'DueDate is required.',
                 'eDuedate.date' => 'Date must be a valid date.',
