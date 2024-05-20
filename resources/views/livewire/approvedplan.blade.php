@@ -50,9 +50,11 @@
                     <button wire:click.stop="export({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                         Export Tag
                     </button>
+                    @if(auth()->id() == $pland->created_by)
                     <button wire:click.stop="openMoveModal({{ $pland->id }})" class="font-medium text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-red-300 text-sm px-3 py-1.5 me-2 mb-2">
                         Move
                     </button>
+                    @endif
                 </div>
                 
             </div>
