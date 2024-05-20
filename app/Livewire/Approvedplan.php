@@ -26,6 +26,9 @@ class Approvedplan extends Component
 
     #[Url(history:true)]
     public $company = "";
+
+    public $movemodal = false;
+    public $planid;
     
     
     public function export($id) 
@@ -40,6 +43,7 @@ class Approvedplan extends Component
         ->where('plandue_id', $id)
         ->groupBy('outpart', 'customer') // Include customer in the group by clause
         ->get();
+        // dd(file_exists("img/J1A-F217G-00-00-80.jpg"));
         
         return Excel::download(new ExportMultipleSheetPlan($exportplan, $test, $test2,$sumvalue),'tag.xlsx');
 
@@ -59,6 +63,32 @@ class Approvedplan extends Component
         }
     }
 
+   
+
+    public function openMoveModal($id) {
+        $this->planid = $id;
+        $this->movemodal = true;
+    }
+
+    public function movePlan(){
+        try{
+            
+            Plandue::where('id',$this->planid)->update(['status'=>'pending']);
+            $this->closeMoveModal();
+        }
+        catch(\Exception $e)
+        {
+
+        }
+    }
+
+
+
+    public function closeMoveModal(){
+        $this->movemodal = false;
+        $this->reset(['planid']);
+    } 
+    
     public function render()
     {
         $get_com = Plandue::whereNotNull('company_name')->distinct()->pluck('company_name');

@@ -489,7 +489,8 @@
             </div>      
         </div>
         <button type="button" wire:click="editAdd" class="mt-2 text-white bg-green-500 hover:bg-green-600 font-medium rounded-lg text-sm px-4 py-2">Add Item</button>    
-    <div class="bg-gray-100 w-full flex justify-end p-4">        
+    <div class="bg-gray-100 w-full flex justify-end p-4">
+        {{-- <button type="buttom" wire:model = "" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Check</button>         --}}
         <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Edit Plan</button>
     </div>
 </form>
