@@ -22,7 +22,7 @@ class PlanCRUD extends Component
     public $duedate;
     public $car;
     public $itemDetails = [
-        ['customer'=>'', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '', 'body' => '','ship_to'=>''],
+     ['customer'=>'', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '', 'body' => '','ship_to'=>''],
     ];
     public $getOutpartSuggestions;
 
@@ -130,7 +130,7 @@ class PlanCRUD extends Component
         'duedate' => 'required|date',
         'car' => 'required',
         'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
-        'itemDetails.*.issue' => 'required|string',
+        'itemDetails.*.issue' => 'required',
         'itemDetails.*.outpart' => ['required',
             function ($attribute, $value, $fail){
             $index = explode('.', $attribute)[1];
@@ -221,7 +221,7 @@ class PlanCRUD extends Component
                 'duedate' => 'required|date',
                 'car' => 'required|in:4W,6W,Trailer,Staion',
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
-                'itemDetails.*.issue' => ['required','string',
+                'itemDetails.*.issue' => ['required',
                 function ($attribute, $value,$fail){
                     $index = explode('.', $attribute)[1];
                     $customer = $this->itemDetails[$index]['customer'];
@@ -232,7 +232,7 @@ class PlanCRUD extends Component
                     }
                 }],
                 'itemDetails.*.po' => 'required',
-                'itemDetails.*.outpart' => ['required','string',
+                'itemDetails.*.outpart' => ['required',
                 function ($attribute, $value, $fail){
                     $index = explode('.', $attribute)[1];
                     $customer = $this->itemDetails[$index]['customer'];
@@ -477,8 +477,8 @@ class PlanCRUD extends Component
             $this->validate([
                 'eDuedate' => 'required|date',
                 'eCar' => 'required|in:4W,6W,Trailer,Staion',
-                "editItemDetails.$index.customer" => ["required","string",Rule::exists('parts','customer')],
-                "editItemDetails.$index.issue" => ['required','string',
+                "editItemDetails.$index.customer" => ["required",Rule::exists('parts','customer')],
+                "editItemDetails.$index.issue" => ['required',
                 function ($attribute, $value,$fail){
                     $index = explode('.', $attribute)[1];
                     $customer = $this->editItemDetails[$index]['customer'];
@@ -489,7 +489,7 @@ class PlanCRUD extends Component
                     }
                 }],
                 "editItemDetails.$index.po" => 'required',
-                "editItemDetails.$index.outpart" => ['required','string',
+                "editItemDetails.$index.outpart" => ['required',
                 function ($attribute, $value, $fail){
                     $index = explode('.', $attribute)[1];
                     $customer = $this->editItemDetails[$index]['customer'];
