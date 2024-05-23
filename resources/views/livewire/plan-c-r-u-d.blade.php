@@ -182,7 +182,8 @@
                             <option value="4W">4W</option>    
                             <option value="6W">6W</option>    
                             <option value="Trailer">Trailer</option>    
-                            <option value="Station">Station</option>     
+                            <option value="Station">Station</option>
+                            <option value="Milk run">Milk run</option>      
                         </select>
                     @error('car') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
@@ -377,7 +378,8 @@
                             <option value="4W">4W</option>    
                             <option value="6W">6W</option>    
                             <option value="Trailer">Trailer</option>    
-                            <option value="Station">Station</option>    
+                            <option value="Station">Station</option>
+                            <option value="Milk run">Milk run</option>          
                         </select>
                     @error('car') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 

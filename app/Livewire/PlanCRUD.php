@@ -219,7 +219,7 @@ class PlanCRUD extends Component
         else {
             $this->validate([
                 'duedate' => 'required|date',
-                'car' => 'required|in:4W,6W,Trailer,Staion',
+                'car' => 'required|in:4W,6W,Trailer,Staion,Milk run',
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
                 'itemDetails.*.issue' => ['required',
                 function ($attribute, $value,$fail){
@@ -476,7 +476,7 @@ class PlanCRUD extends Component
         // dd($this->editItemDetails[$index]['customer']);           
             $this->validate([
                 'eDuedate' => 'required|date',
-                'eCar' => 'required|in:4W,6W,Trailer,Staion',
+                'eCar' => 'required|in:4W,6W,Trailer,Staion,Milk run',
                 "editItemDetails.$index.customer" => ["required",Rule::exists('parts','customer')],
                 "editItemDetails.$index.issue" => ['required',
                 function ($attribute, $value,$fail){
