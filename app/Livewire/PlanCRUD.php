@@ -157,16 +157,18 @@ class PlanCRUD extends Component
 
         foreach($this->itemDetails as $checkIssue) 
         {
-            $latestIssue = Listitem::where('issue', 'LIKE' ,"%-{$checkIssue['issue']}")->orderByDesc('issue')->first();
-            $latestNumber = $latestIssue ? (int) explode('-', $latestIssue->issue)[0] : 0;
+            // $latestIssue = Listitem::where('issue', 'LIKE' ,"%-{$checkIssue['issue']}")->orderByDesc('issue')->first();
+            // $latestNumber = $latestIssue ? (int) explode('-', $latestIssue->issue)[0] : 0;
 
             $maxQuantity = Part::where('customer', $checkIssue['customer'])->where('outpart',$checkIssue['outpart'])->first();
             $snp = $maxQuantity->snp ?? null;
+            // dd($checkIssue);
             $baseBody = $checkIssue['body'];
             if ($snp && $checkIssue['quantity'] > $snp) {
                 $setNeeded = ceil($checkIssue['quantity'] / $snp);
                 for ($i = 1; $i <= $setNeeded; $i++) {
-                    $count = $latestNumber + $i;
+                    // $count = $latestNumber + $i;
+                    // dd($checkIssue['quantity']);
                     $quantityToAdd = min($checkIssue['quantity'], $snp); 
                     if (is_numeric($baseBody)) {
                         $finalBody = $baseBody + $quantityToAdd - 1 ?? null;
@@ -174,7 +176,7 @@ class PlanCRUD extends Component
                     }
                     $this->itemDetails[] = [
                         'customer' => $this->itemDetails[0]['customer'],
-                        'issue' => "{$count}-{$this->itemDetails[0]['issue']}",
+                        'issue' => "{$this->itemDetails[0]['issue']}",
                         'po' => $this->itemDetails[0]['po'],
                         'outpart' => $this->itemDetails[0]['outpart'],
                         'quantity' => $quantityToAdd,
@@ -187,50 +189,63 @@ class PlanCRUD extends Component
                         $baseBody = $finalBody + 1 ?? null; 
                     }
                 }
-                array_splice($this->itemDetails, 0, 1);
+                array_splice($this->itemDetails, 0,1);
             }
-            else
-            {
-                if (is_numeric($baseBody)) {
-                    $finalBody = $baseBody + $checkIssue['quantity'] - 1 ?? null;
-                    $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
-                }
+            else{
                 $this->itemDetails[] = [
-                    'customer' => $this->itemDetails[0]['customer'],
-                    'issue' => $latestIssue > 0 ? ($latestIssue + 1) . "-{$this->itemDetails[0]['issue']}" : $this->itemDetails[0]['issue'],
-                    'po' => $this->itemDetails[0]['po'],
-                    'outpart' => $this->itemDetails[0]['outpart'],
-                    'quantity' => $this->itemDetails[0]['quantity'],
-                    'body' => $body ?? $baseBody,
-                    'ship_to' => $this->itemDetails[0]['ship_to'],
-                ];
-                array_splice($this->itemDetails, 0, 1);
-            }          
+                            'customer' => $this->itemDetails[0]['customer'],
+                            'issue' => $this->itemDetails[0]['issue'],
+                            'po' => $this->itemDetails[0]['po'],
+                            'outpart' => $this->itemDetails[0]['outpart'],
+                            'quantity' => $this->itemDetails[0]['quantity'],
+                            'body' => $body ?? $baseBody,
+                            'ship_to' => $this->itemDetails[0]['ship_to'],
+                        ];
+                array_splice($this->itemDetails, 0, 1); 
+            }
+            // else
+            // {
+            //     if (is_numeric($baseBody)) {
+            //         $finalBody = $baseBody + $checkIssue['quantity'] - 1 ?? null;
+            //         $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
+            //     }
+            //     $this->itemDetails[] = [
+            //         'customer' => $this->itemDetails[0]['customer'],
+            //         'issue' => $latestIssue > 0 ? ($latestIssue + 1) . "-{$this->itemDetails[0]['issue']}" : $this->itemDetails[0]['issue'],
+            //         'po' => $this->itemDetails[0]['po'],
+            //         'outpart' => $this->itemDetails[0]['outpart'],
+            //         'quantity' => $this->itemDetails[0]['quantity'],
+            //         'body' => $body ?? $baseBody,
+            //         'ship_to' => $this->itemDetails[0]['ship_to'],
+            //     ];
+            //     array_splice($this->itemDetails, 0, 1);
+            // }          
         }
     }
 
     public function createPlan()
     {
-        $this->duplicateInput = false;
+        // $this->duplicateInput = false;
 
-        if (count(array_column($this->itemDetails, 'issue')) !== count(array_unique(array_column($this->itemDetails, 'issue')))) {
-            $this->duplicateInput = true;
-        } 
-        else {
+        // if (count(array_column($this->itemDetails, 'issue')) !== count(array_unique(array_column($this->itemDetails, 'issue')))) {
+        //     $this->duplicateInput = true;
+        // } 
+        // else {
             $this->validate([
                 'duedate' => 'required|date',
                 'car' => 'required|in:4W,6W,Trailer,Staion,Milk run',
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
                 'itemDetails.*.issue' => ['required',
-                function ($attribute, $value,$fail){
-                    $index = explode('.', $attribute)[1];
-                    $customer = $this->itemDetails[$index]['customer'];
-                    $issue = $this->itemDetails[$index]['issue'];
+                // function ($attribute, $value,$fail){
+                //     $index = explode('.', $attribute)[1];
+                //     $customer = $this->itemDetails[$index]['customer'];
+                //     $issue = $this->itemDetails[$index]['issue'];
 
-                    if(Listitem::where('customer', $customer)->where('issue', $issue)->exists()){
-                        $fail("The issue is duplicate");
-                    }
-                }],
+                //     if(Listitem::where('customer', $customer)->where('issue', $issue)->exists()){
+                //         $fail("The issue is duplicate");
+                //     }
+                // }
+                ],
                 'itemDetails.*.po' => 'required',
                 'itemDetails.*.outpart' => ['required',
                 function ($attribute, $value, $fail){
@@ -399,7 +414,7 @@ class PlanCRUD extends Component
             $this->hideCreateModal();
             session()->flash('error', 'An error occurred while create the plan.');  
             }
-        } 
+        // } 
     }
 
     public $deleteId;
@@ -467,27 +482,28 @@ class PlanCRUD extends Component
     
     public function editPlan()
     {
-        $this->duplicateInput = false;
-        if (count(array_column($this->editItemDetails, 'issue')) !== count(array_unique(array_column($this->editItemDetails, 'issue')))) {
-            $this->duplicateInput = true;
-        } 
+        // $this->duplicateInput = false;
+        // if (count(array_column($this->editItemDetails, 'issue')) !== count(array_unique(array_column($this->editItemDetails, 'issue')))) {
+        //     $this->duplicateInput = true;
+        // } 
 
         foreach($this->editItemDetails as $index  => $item)
-        // dd($this->editItemDetails[$index]['customer']);           
+              
             $this->validate([
                 'eDuedate' => 'required|date',
                 'eCar' => 'required|in:4W,6W,Trailer,Staion,Milk run',
                 "editItemDetails.$index.customer" => ["required",Rule::exists('parts','customer')],
                 "editItemDetails.$index.issue" => ['required',
-                function ($attribute, $value,$fail){
-                    $index = explode('.', $attribute)[1];
-                    $customer = $this->editItemDetails[$index]['customer'];
-                    $issue = $this->editItemDetails[$index]['issue'];
+                // function ($attribute, $value,$fail){
+                //     $index = explode('.', $attribute)[1];
+                //     $customer = $this->editItemDetails[$index]['customer'];
+                //     $issue = $this->editItemDetails[$index]['issue'];
 
-                    if(Listitem::where('customer', $customer)->where('issue', $issue)->where('id', '!=', $this->editItemDetails[$index]['id'])->exists()){
-                        $fail("The issue is duplicate");
-                    }
-                }],
+                //     if(Listitem::where('customer', $customer)->where('issue', $issue)->where('id', '!=', $this->editItemDetails[$index]['id'])->exists()){
+                //         $fail("The issue is duplicate");
+                //     }
+                // }
+                ],
                 "editItemDetails.$index.po" => 'required',
                 "editItemDetails.$index.outpart" => ['required',
                 function ($attribute, $value, $fail){
@@ -501,7 +517,20 @@ class PlanCRUD extends Component
                     }
                 }
                 ],
-                "editItemDetails.$index.quantity" => "required|numeric",
+                "editItemDetails.$index.quantity" => ["required", 'numeric', 
+                function ($attribute, $value, $fail) {
+                    
+                    $index = explode('.', $attribute)[1];
+                    $outpart = $this->editItemDetails[$index]['outpart'] ?? null;
+                    $limit = Part::where('outpart', $outpart)->value('snp');
+                      if(is_null($limit)){
+                        $fail("");
+                      }
+        
+                    if ($value > $limit) {
+                        $fail("The quantity for $outpart exceeds the limit.");
+                    }
+                }],
                 ],[
                 'eDuedate.required' => 'DueDate is required.',
                 'eDuedate.date' => 'Date must be a valid date.',
