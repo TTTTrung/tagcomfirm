@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Models\Part;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -12,6 +13,7 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -151,11 +153,41 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 return "A1";
             }
 
+            // public function drawings()
+            // {
+                // dd(file_exists("img/J1A-F217G-00-00-80.jpg"));
+                // $drawing = new Drawing();
+                // $drawing->setName('Logo');
+                // $drawing->setDescription('This is my logo');
+                // $drawing->setPath(public_path('img/J1A-F217G-00-00-80.jpg'));
+                // $drawing->setHeight(85);
+                // $drawing->setWidth(200);
+                // $drawing->setCoordinates('E6');
+                
+                // return [$drawing];
+            //     $drawings = [];
+            //     $count = 1;
+            //     foreach ($this->test as $picture)
+            //     {
+            //         $partname = Part::where('outpart',$picture->outpart)->first();
+            //         $trupart = $partname->trupart ?? null;
+            //         $drawing = new Drawing();
+            //         $drawing->setName($trupart);
+            //         $drawing->setPath(public_path("img/J1A-F217G-00-00-80.jpg"));
+            //         $drawing->setHeight(85);
+            //         $drawing->setWidth(200);
+            //         $drawing->setCoordinates("E".($count + 5));
+            //         $count += 13;
+            //         $drawings[] = $drawing;
+            //     }
+            //     return $drawings;
+            // }
+           
+
             public function styles(Worksheet $sheet)
             {
             $count = 1; // Start with 1 if you want to start from row 1
             $sheet->getColumnDimension('A')->setWidth(12);
-
 
             // $sheet->setShowGridlines(false);    
             foreach ($this->test as $tt) {
@@ -212,6 +244,11 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->getStyle("E".($count))->getFont()->setName('IDAutomationHC39M Free Version')->setSize(9);
                     $sheet->getStyle("E".($count))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("E".($count))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+
+                    $sheet->mergeCells("D".($count + 5).":H".($count + 8));
+                    // $drawing = new Drawing();
+                    // $drawing->setPath("D:/J1A-F217G-00-00-80.jpg");
+                    // $drawing->setCoordinates("D".($count + 5));
                     $count += 13;   
                     
                 }
@@ -346,7 +383,8 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
 
                 foreach ($this->sumvalue as $index => $outpart){
                 $type = Part::where("outpart",$outpart->outpart)->where("customer",$outpart->customer)->first();
-                $is_po =$this->test->firstWhere('outpart',$outpart->outpart);
+                $is_po =$this->test->Where('outpart',$outpart->outpart)->where('po',$outpart->po)->first();
+                // dd($is_po);
                 if(str_contains($is_po->body,"-"))
                 {
                     $lastItem = $this->test->Where('outpart', $outpart->outpart)->last();
@@ -361,7 +399,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->setCellValue("C{$currentrow}",$outpart->outpart);
                 $sheet->setCellValue("D{$currentrow}",$type->partname);
                 $sheet->setCellValue("E{$currentrow}",$is_po->issue);
-                $sheet->setCellValue("F{$currentrow}",$is_po->po);
+                $sheet->setCellValue("F{$currentrow}",$outpart->po);
                 $sheet->setCellValue("G{$currentrow}",$outpart->total_quantity);
                 $sheet->setCellValue("H{$currentrow}",$body ?? null);
                 $sheet->setCellValue("I{$currentrow}",$type->snp ?? null);

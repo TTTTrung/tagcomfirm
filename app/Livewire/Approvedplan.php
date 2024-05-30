@@ -7,6 +7,8 @@ use App\Exports\PlandueExport;
 use App\Exports\ShortPlanExport;
 use App\Exports\TagsExport;
 use App\Models\Listitem;
+use App\Models\Opland;
+use App\Models\Part;
 use App\Models\Plandue;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
@@ -39,10 +41,11 @@ class Approvedplan extends Component
                 }
         $test = $exportplan->listitems;
         $test2 = $exportplan->createBy;
-        $sumvalue = Listitem::select('outpart', 'customer', DB::raw('SUM(quantity) as total_quantity'),DB::raw('SUM(prize) as total_price'))
+        $sumvalue = Listitem::select('outpart', 'po','customer', DB::raw('SUM(quantity) as total_quantity'),DB::raw('SUM(prize) as total_price'))
         ->where('plandue_id', $id)
-        ->groupBy('outpart', 'customer') // Include customer in the group by clause
+        ->groupBy('outpart', 'po', 'customer') // Include customer in the group by clause
         ->get();
+        // dd($sumvalue);
         // dd(file_exists("img/J1A-F217G-00-00-80.jpg"));
         
         return Excel::download(new ExportMultipleSheetPlan($exportplan, $test, $test2,$sumvalue),'tag.xlsx');
@@ -87,7 +90,61 @@ class Approvedplan extends Component
     public function closeMoveModal(){
         $this->movemodal = false;
         $this->reset(['planid']);
-    } 
+    }
+    
+    public function oracle($id){
+        try{
+        $oracle = Plandue::with('listitems')->find($id);
+        $summedItems = $oracle->listitems()
+        ->select('customer','outpart', 'po', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
+        ->groupBy('outpart', 'po','customer')
+        ->get();
+        
+        $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
+        $checkExist = Opland::where('legacy_so_num',$oracle->plan_id)->first();
+        // dd($checkExist);
+        }catch(\Exception $e){
+            session()->flash('error', 'can not get plan id'); 
+        }
+        if(empty($checkExist)){
+        DB::beginTransaction();
+        try{
+        $pland = Opland::create([
+            'legacy_so_num' => $oracle->plan_id,
+            'customer_no'=>$oracle->listitems->first()->customer,
+            'bill_to'=>$part->bill_to,
+            'transaction_type'=>$part->order_type,
+            'order_date'=>$oracle->duedate,
+            'price_list'=>$part->price_list,
+            'salesperson'=>$part->sale_reps,
+            'warehouse'=>'TRU',
+            
+        ]);
+        foreach ($summedItems as $index=>$item) {
+            $filteredItem = $oracle->listitems->where('po', $item->po)->where('outpart', $item->outpart)->first();
+            $pland->olist()->create([
+                'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')
+                ->first(),
+                'qty'=>$item->total_quantity,
+                'price_unit'=>$item->total_price,
+                'customer_part_number'=> $item->outpart,
+                'po_number'=>$item->po,
+                'issue_number'=>$filteredItem->issue,
+                'line_num'=> $index+1
+            ]);
+            DB::commit();
+            session()->flash('success', ' Commit data to oracle succesfuly'); 
+        }
+        }catch(\Exception $e){
+            DB::rollBack();
+            session()->flash('error', 'can not insert data into oracle pls try again later.'); 
+        }
+    }
+    else{
+        session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
+    }
+       
+    }
     
     public function render()
     {
