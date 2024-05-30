@@ -1,6 +1,6 @@
 <div>
     <div class="py-12">
-        <div class="mx-auto sm:px-6 lg:px-8" :style="{'max-width' : '90rem' }">
+        <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto p-6 text-gray-900">
                     <div class="pb-4 bg-white  flex justify-between items-center">
@@ -61,6 +61,18 @@
                                 <th scope="col" class="px-6 py-3">
                                     W*L*H
                                 </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Order type
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Sale person
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Price list
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Bill to
+                                </th>
                                 {{-- <th scope="col" class="px-6 py-3">
                                     Created by
                                 </th>
@@ -102,6 +114,18 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     {{$part->pl_size }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ $part->order_type }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->sale_reps }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->price_list }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->bill_to }}
                                 </td>
                                 {{-- <td class="px-6 py-4">
                                     {{ optional($part->createdBy)->name }}
@@ -201,6 +225,52 @@
                         @error('wlh') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="ordertype" class="block mb-2 text-sm font-medium text-gray-900">Order type</label>
+                        <select wire:model.live="ordertype"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                        <option value="">All</option>
+                        @foreach ($ordertypes as $ordertype)
+                        <option value="{{ $ordertype->name }}">{{ $ordertype->name }}</option>
+                        @endforeach
+                    </select>
+                        @error('ordertype') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="salerep" class="block mb-2 text-sm font-medium text-gray-900">Sale person</label>
+                        <select wire:model.live="salerep"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                        <option value="">All</option>
+                        @foreach ($salereps as $salerep)
+                        <option value="{{ $salerep->resource_name }}">{{ $salerep->resource_name }}</option>
+                        @endforeach
+                    </select>
+                        @error('salerep') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="pricelist" class="block mb-2 text-sm font-medium text-gray-900">Price list</label>
+                        <select wire:model.live="pricelist"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                        <option value="">All</option>
+                        @foreach ($pricelists as $pricelist)
+                        <option value="{{ $pricelist->name }}">{{ $pricelist->name }}</option>
+                        @endforeach
+                    </select>
+                        @error('pricelist') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="bill_to" class="block mb-2 text-sm font-medium text-gray-900">Bill to</label>
+                        <input id="bill_to" wire:model="bill_to" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('bill_to') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
                     </div>      
                 </div>
         </div>
@@ -283,7 +353,53 @@
                         @error('ewlh') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
-                    </div>     
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="eordertype" class="block mb-2 text-sm font-medium text-gray-900">Order type</label>
+                        <select wire:model.live="eordertype"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                        <option value="">All</option>
+                        @foreach ($ordertypes as $ordertype)
+                        <option value="{{ $ordertype->name }}">{{ $ordertype->name }}</option>
+                        @endforeach
+                    </select>
+                        @error('eordertype') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="esalerep" class="block mb-2 text-sm font-medium text-gray-900">Sale person</label>
+                        <select wire:model.live="esalerep"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                        <option value="">All</option>
+                        @foreach ($salereps as $salerep)
+                        <option value="{{ $salerep->resource_name }}">{{ $salerep->resource_name }}</option>
+                        @endforeach
+                    </select>
+                        @error('esalerep') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="epricelist" class="block mb-2 text-sm font-medium text-gray-900">Price list</label>
+                        <select wire:model.live="epricelist"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                        <option value="">All</option>
+                        @foreach ($pricelists as $pricelist)
+                        <option value="{{ $pricelist->name }}">{{ $pricelist->name }}</option>
+                        @endforeach
+                    </select>
+                        @error('epricelist') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="ebill_to" class="block mb-2 text-sm font-medium text-gray-900">Bill to</label>
+                        <input id="ebill_to" wire:model="ebill_to" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('ebill_to') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>      
                 </div>
         </div>
     <div class="bg-gray-100 w-full flex justify-end p-4">
