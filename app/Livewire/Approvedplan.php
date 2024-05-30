@@ -130,7 +130,7 @@ class Approvedplan extends Component
                     'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')
                     ->first(),
                     'qty'=>$item->total_quantity,
-                    'price_unit'=>$item->total_price,
+                    'price_unit'=>$item->total_price / $item->total_quantity,
                     'customer_part_number'=> $item->outpart,
                     'po_number'=>$item->po,
                     'issue_number'=>$filteredItem->issue,
