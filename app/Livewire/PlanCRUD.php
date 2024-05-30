@@ -192,6 +192,10 @@ class PlanCRUD extends Component
                 array_splice($this->itemDetails, 0,1);
             }
             else{
+                if (is_numeric($baseBody)) {
+                            $finalBody = $baseBody + $checkIssue['quantity'] - 1 ?? null;
+                            $body = $finalBody != null ? "{$baseBody}-{$finalBody}" : $baseBody;
+                        }
                 $this->itemDetails[] = [
                             'customer' => $this->itemDetails[0]['customer'],
                             'issue' => $this->itemDetails[0]['issue'],
