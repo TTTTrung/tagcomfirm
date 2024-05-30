@@ -106,44 +106,49 @@ class Approvedplan extends Component
         }catch(\Exception $e){
             session()->flash('error', 'can not get plan id'); 
         }
-        if(empty($checkExist)){
-        DB::beginTransaction();
-        try{
-        $pland = Opland::create([
-            'legacy_so_num' => $oracle->plan_id,
-            'customer_no'=>$oracle->listitems->first()->customer,
-            'bill_to'=>$part->bill_to,
-            'transaction_type'=>$part->order_type,
-            'order_date'=>$oracle->duedate,
-            'price_list'=>$part->price_list,
-            'salesperson'=>$part->sale_reps,
-            'warehouse'=>'TRU',
-            
-        ]);
-        foreach ($summedItems as $index=>$item) {
-            $filteredItem = $oracle->listitems->where('po', $item->po)->where('outpart', $item->outpart)->first();
-            $pland->olist()->create([
-                'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')
-                ->first(),
-                'qty'=>$item->total_quantity,
-                'price_unit'=>$item->total_price,
-                'customer_part_number'=> $item->outpart,
-                'po_number'=>$item->po,
-                'issue_number'=>$filteredItem->issue,
-                'line_num'=> $index+1
+        if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
+            session()->flash('error', 'Not enough data for oracle');
+        }
+        else{
+            if(empty($checkExist)){
+            DB::beginTransaction();
+            try{
+            $pland = Opland::create([
+                'legacy_so_num' => $oracle->plan_id,
+                'customer_no'=>$oracle->listitems->first()->customer,
+                'bill_to'=>$part->bill_to,
+                'transaction_type'=>$part->order_type,
+                'order_date'=>$oracle->duedate,
+                'price_list'=>$part->price_list,
+                'salesperson'=>$part->sale_reps,
+                'warehouse'=>'TRU',
+                
             ]);
-            DB::commit();
-            session()->flash('success', ' Commit data to oracle succesfuly'); 
+            foreach ($summedItems as $index=>$item) {
+                $filteredItem = $oracle->listitems->where('po', $item->po)->where('outpart', $item->outpart)->first();
+                $pland->olist()->create([
+                    'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')
+                    ->first(),
+                    'qty'=>$item->total_quantity,
+                    'price_unit'=>$item->total_price,
+                    'customer_part_number'=> $item->outpart,
+                    'po_number'=>$item->po,
+                    'issue_number'=>$filteredItem->issue,
+                    'line_num'=> $index+1
+                ]);
+                DB::commit();
+                session()->flash('success', ' Commit data to oracle succesfuly'); 
+            }
+            }catch(\Exception $e){
+                DB::rollBack();
+                session()->flash('error', 'can not insert data into oracle pls try again later.'); 
+            }
+        
         }
-        }catch(\Exception $e){
-            DB::rollBack();
-            session()->flash('error', 'can not insert data into oracle pls try again later.'); 
+            else{
+                session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
+            }
         }
-    }
-    else{
-        session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
-    }
-       
     }
     
     public function render()
