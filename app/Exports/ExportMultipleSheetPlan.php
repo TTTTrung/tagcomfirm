@@ -88,6 +88,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->setCellValue('B3',$this->test2->name);
                 $sheet->setCellValue('A4','Approved By :');
                 $sheet->setCellValue('B4',$this->test2->name);
+                $sheet->setCellValue('K2','Go with: '.($this->data->go_with));
                 $currentRow = 7;
                 
                 foreach($this->test as $t)
@@ -304,6 +305,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->mergeCells("K2:N3");
                 $sheet->setCellValue('K2',"{$this->data->duedate}"."  Car: "."{$this->data->car}");
                 $sheet->getStyle("K2")->getFont()->setSize(20);
+                $sheet->setCellValue('K2','Go with: '.($this->data->go_with));
                 $styleArray = [
                     'borders' => [
                         'top' => [

@@ -21,6 +21,7 @@ class PlanCRUD extends Component
     public $showCreateModal = false;
     public $duedate;
     public $car;
+    public $gowith;
     public $itemDetails = [
      ['customer'=>'', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '', 'body' => '','ship_to'=>''],
     ];
@@ -238,6 +239,7 @@ class PlanCRUD extends Component
             $this->validate([
                 'duedate' => 'required|date',
                 'car' => 'required|in:4W,6W,Trailer,Staion,Milk run',
+                'gowith' => Rule::exists('plandues','plan_id'),
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
                 'itemDetails.*.issue' => ['required',
                 // function ($attribute, $value,$fail){
@@ -334,6 +336,7 @@ class PlanCRUD extends Component
                 'company_name' => $customer[0]->customer_name ?? null,
                 'duedate' => $this->duedate,
                 'car' => $this->car,
+                'go_with' => $this->gowith,
                 'created_by' => auth()->id(),
             ]);
 
@@ -460,6 +463,7 @@ class PlanCRUD extends Component
     public $countEditItems;
     public $eDuedate;
     public $eCar;
+    public $egowith;
     public $deleteItem;
 
     public function openEditModal($id)
@@ -474,6 +478,7 @@ class PlanCRUD extends Component
             {
                 $this->eDuedate = $editItem->duedate;
                 $this->eCar = $editItem->car;
+                $this->egowith = $editItem->go_with;
                 foreach($editItem->listitems as $editItem)
                 {
                 $this->editItemDetails[] = ['id'=>$editItem->id ,'customer' => $editItem->customer, 'duedate' => $editItem->duedate , 'issue' => $editItem->issue,'po' => $editItem->po, 'outpart' => $editItem->outpart, 'quantity' =>$editItem->quantity,'prize'=>$editItem->prize, 'body'=>$editItem->body,'ship_to'=>$editItem->ship_to];
@@ -553,6 +558,7 @@ class PlanCRUD extends Component
             Plandue::where('id',$this->editId)->update([
                 'duedate' => $this->eDuedate,
                 'car' => $this->eCar,
+                'go_with' => $this->egowith,
             ]);
             
         if(!empty($this->deleteItem)){   
@@ -655,7 +661,8 @@ class PlanCRUD extends Component
     public function render()
     {    
         $plands = Plandue::where('status','pending')->where('created_by', auth()->id() )->with('listitems')->get();
+        $listpland = Plandue::orderBy('id')->get();
 
-        return view('livewire.plan-c-r-u-d',compact('plands'));
+        return view('livewire.plan-c-r-u-d',compact('plands','listpland'));
     }
 }

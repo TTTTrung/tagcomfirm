@@ -188,6 +188,20 @@
                     @error('car') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="gowith" class="text-xs">Go with</label>
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "gowith" wire:model="gowith"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option value="">All</option>
+                           @foreach ($listpland as $item)
+                           <option value="{{$item->plan_id}}">{{$item->plan_id}}</option>
+                           @endforeach   
+                        </select>
+                    @error('car') 
+                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
                 </div>   
             </div>
         </div> 
@@ -384,7 +398,21 @@
                     @error('car') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
-                </div>   
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="egowith" class="text-xs">Go with</label>
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "egowith" wire:model="egowith"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option value="">All</option>
+                           @foreach ($listpland as $item)
+                           <option value="{{$item->plan_id}}">{{$item->plan_id}}</option>
+                           @endforeach   
+                        </select>
+                    @error('car') 
+                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>     
             </div>
         </div>
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">        
