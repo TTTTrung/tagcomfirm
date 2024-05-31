@@ -239,7 +239,6 @@ class PlanCRUD extends Component
             $this->validate([
                 'duedate' => 'required|date',
                 'car' => 'required|in:4W,6W,Trailer,Staion,Milk run',
-                'gowith' => Rule::exists('plandues','plan_id'),
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
                 'itemDetails.*.issue' => ['required',
                 // function ($attribute, $value,$fail){

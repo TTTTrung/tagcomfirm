@@ -199,7 +199,7 @@
                            <option value="{{$item->plan_id}}">{{$item->plan_id}}</option>
                            @endforeach   
                         </select>
-                    @error('car') 
+                    @error('gowith') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>   
@@ -379,7 +379,7 @@
                 <div class="w-48">
                     <label for="due" class="text-xs">Due Date</label>
                     <input id="due" wire:model="eDuedate" type="datetime-local" class="w-full p-2 border border-gray-300 text-xs rounded" required /> 
-                    @error('duedate') 
+                    @error('eDuedate') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
@@ -395,7 +395,7 @@
                             <option value="Station">Station</option>
                             <option value="Milk run">Milk run</option>          
                         </select>
-                    @error('car') 
+                    @error('eCar') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
@@ -409,7 +409,7 @@
                            <option value="{{$item->plan_id}}">{{$item->plan_id}}</option>
                            @endforeach   
                         </select>
-                    @error('car') 
+                    @error('egowith') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>     
