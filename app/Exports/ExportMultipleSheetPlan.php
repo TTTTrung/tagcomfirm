@@ -305,7 +305,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->mergeCells("K2:N3");
                 $sheet->setCellValue('K2',"{$this->data->duedate}"."  Car: "."{$this->data->car}");
                 $sheet->getStyle("K2")->getFont()->setSize(20);
-                $sheet->setCellValue('K2','Go with: '.($this->data->go_with));
+                $sheet->setCellValue('K4','Go with: '.($this->data->go_with));
                 $styleArray = [
                     'borders' => [
                         'top' => [
