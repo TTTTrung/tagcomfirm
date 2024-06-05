@@ -16,6 +16,7 @@ class ListitemImport implements ToCollection
                 'customer' => $rows[0],
                 'issue' => $rows[1],
                 'po' => $rows[2],
+                'pr' => $rows[3],
                 'outpart' => $rows[3],
                 'quantity' => $rows[4],
                 'body' => $rows[5],

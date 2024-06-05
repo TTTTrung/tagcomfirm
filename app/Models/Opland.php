@@ -23,7 +23,8 @@ class Opland extends Model
         'order_date',
         'price_list',
         'salesperson',
-        'warehouse'
+        'warehouse',
+        'customer_po_no'
         ];
 
     public function olist():HasMany

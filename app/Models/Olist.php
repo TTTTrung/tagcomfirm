@@ -15,7 +15,7 @@ class Olist extends Model
     public $incrementing = false;
     protected $keytype = "string";
     public $timestamps= false;
-    protected $fillable = ['item_code','qty','price_unit','customer_part_number','po_number','issue_number','line_num'];
+    protected $fillable = ['item_code','qty','price_unit','customer_part_number','po_number','issue_number','line_num','pr_number'];
 
     public function oplan():BelongsTo
     {

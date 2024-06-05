@@ -23,7 +23,7 @@ class PlanCRUD extends Component
     public $car;
     public $gowith;
     public $itemDetails = [
-     ['customer'=>'', 'issue' => '','po' => '', 'outpart' => '', 'quantity' => '', 'body' => '','ship_to'=>''],
+     ['customer'=>'', 'issue' => '','po' => '','pr'=>'', 'outpart' => '', 'quantity' => '', 'body' => '','ship_to'=>''],
     ];
     public $getOutpartSuggestions;
 
@@ -50,16 +50,18 @@ class PlanCRUD extends Component
             $customer = $row[0] ?? null;
             $issue = $row[1] ?? null;
             $po = $row[2] ?? null;
-            $outpart = $row[3] ?? null;
-            $quantity = $row[4] ?? null;
-            $body = $row[5] ?? null;
-            $ship_to = $row[6] ?? null;
+            $pr = $row[3] ?? null;
+            $outpart = $row[4] ?? null;
+            $quantity = $row[5] ?? null;
+            $body = $row[6] ?? null;
+            $ship_to = $row[7] ?? null;
         
             
             $itemDetails = [
                 'customer' => $customer,
                 'issue' => $issue,
                 'po' => $po,
+                'pr'=> $pr,
                 'outpart' => $outpart,
                 'quantity' => $quantity,
                 'body' => $body,
@@ -109,7 +111,7 @@ class PlanCRUD extends Component
 
     public function addItem()
     {
-        $this->itemDetails[] = ['customer'=>'', 'issue' => '','po'=> '', 'outpart' => '', 'quantity' => '','body' => '','ship_to'=>''];
+        $this->itemDetails[] = ['customer'=>'', 'issue' => '','po'=> '','pr'=>'', 'outpart' => '', 'quantity' => '','body' => '','ship_to'=>''];
     }
 
     public function clearItem()
@@ -179,6 +181,7 @@ class PlanCRUD extends Component
                         'customer' => $this->itemDetails[0]['customer'],
                         'issue' => "{$this->itemDetails[0]['issue']}",
                         'po' => $this->itemDetails[0]['po'],
+                        'pr'=> $this->itemDetails[0]['pr'],
                         'outpart' => $this->itemDetails[0]['outpart'],
                         'quantity' => $quantityToAdd,
                         'body' => $body ?? $baseBody,
@@ -201,6 +204,7 @@ class PlanCRUD extends Component
                             'customer' => $this->itemDetails[0]['customer'],
                             'issue' => $this->itemDetails[0]['issue'],
                             'po' => $this->itemDetails[0]['po'],
+                            'pr'=> $this->itemDetails[0]['pr'],
                             'outpart' => $this->itemDetails[0]['outpart'],
                             'quantity' => $this->itemDetails[0]['quantity'],
                             'body' => $body ?? $baseBody,
@@ -238,7 +242,7 @@ class PlanCRUD extends Component
         // else {
             $this->validate([
                 'duedate' => 'required|date',
-                'car' => 'required|in:4W,6W,Trailer,Staion,Milk run',
+                'car' => 'required|in:4W,6W,Trailer,Station,Milk run',
                 'itemDetails.*.customer' => ['required', Rule::exists('parts','customer')],
                 'itemDetails.*.issue' => ['required',
                 // function ($attribute, $value,$fail){
@@ -248,6 +252,21 @@ class PlanCRUD extends Component
 
                 //     if(Listitem::where('customer', $customer)->where('issue', $issue)->exists()){
                 //         $fail("The issue is duplicate");
+                //     }
+                // }
+                // function ($attribute, $value, $fail) {
+                //     $finds = ['[issue]', '[lot]', '[line]', '[serial]'];
+                //     $found = false;
+            
+                //     foreach ($finds as $find) {
+                //         if (strpos($value, $find) === 0) {
+                //             $found = true;
+                //             break;
+                //         }
+                //     }
+            
+                //     if (!$found) {
+                //         $fail('The value must start  with one of the following prefixes: ' . implode(', ', $finds) . '.');
                 //     }
                 // }
                 ],
@@ -294,7 +313,7 @@ class PlanCRUD extends Component
                 'itemDetails.*.quantity.numeric' => 'Quantity must be numeric.',
                 'itemDetails.*.quantity.exceeds_limit' => 'The quantity exceeds the maximum limit for the outpart.',
             ]);
-         try{
+        //  try{
             $currentDate = Carbon::now()->format('Ymd');
             $latestRecord = Plandue::latest()->whereDate('created_at',$currentDate)->first();
             $counter = $latestRecord ? (int) substr($latestRecord->plan_id, -4) + 1 : 1;
@@ -398,13 +417,14 @@ class PlanCRUD extends Component
                 ORDER BY
                     M_ITEM_CODE") ?? 0;
                 }
-                // dd($item);
+                // dd($item['pr']);
                 Listitem::create([
                     'plandue_id' => $plan->id,
                     'created_by' => auth()->id(),
                     'customer' => $item['customer'],
                     'issue' => $item['issue'],
                     'po' => $item['po'],
+                    'pr'=>$item['pr'],
                     'outpart' => $item['outpart'],
                     'prize'=>  $item['quantity'] * ($price[0]->operand ?? 0) ?? null,
                     'quantity' => $item['quantity'],
@@ -412,14 +432,14 @@ class PlanCRUD extends Component
                     'ship_to' => $item['ship_to'],
                 ]);
             }
-            $this->reset('itemDetails');
+            $this->reset(['itemDetails','duedate','car']);
             $this->hideCreateModal();
             session()->flash('success', 'Plan create successfully.');
-        }catch (\Exception $e)
-            {
-            $this->hideCreateModal();
-            session()->flash('error', 'An error occurred while create the plan.');  
-            }
+        // }catch (\Exception $e)
+        //     {
+        //     $this->hideCreateModal();
+        //     session()->flash('error', 'An error occurred while create the plan.');  
+        //     }
         // } 
     }
 
@@ -480,7 +500,7 @@ class PlanCRUD extends Component
                 $this->egowith = $editItem->go_with;
                 foreach($editItem->listitems as $editItem)
                 {
-                $this->editItemDetails[] = ['id'=>$editItem->id ,'customer' => $editItem->customer, 'duedate' => $editItem->duedate , 'issue' => $editItem->issue,'po' => $editItem->po, 'outpart' => $editItem->outpart, 'quantity' =>$editItem->quantity,'prize'=>$editItem->prize, 'body'=>$editItem->body,'ship_to'=>$editItem->ship_to];
+                $this->editItemDetails[] = ['id'=>$editItem->id ,'customer' => $editItem->customer, 'duedate' => $editItem->duedate , 'issue' => $editItem->issue,'po' => $editItem->po,'pr'=>$editItem->pr, 'outpart' => $editItem->outpart, 'quantity' =>$editItem->quantity,'prize'=>$editItem->prize, 'body'=>$editItem->body,'ship_to'=>$editItem->ship_to];
                 }
             }
         }
@@ -571,11 +591,12 @@ class PlanCRUD extends Component
                 'customer' => $updateItem['customer'],
                 'issue' => $updateItem['issue'],
                 'po' => $updateItem['po'],
+                'pr' => $updateItem['pr'],
                 'outpart'=>$updateItem['outpart'],
                 'quantity'=>$updateItem['quantity'],
-                'prize'=>$updateItem['prize'],
-                'body' =>$updateItem['body'],
-                'ship_to' =>$updateItem['ship_to'],
+                'prize'=> $updateItem['prize'],
+                'body' => $updateItem['body'],
+                'ship_to' => $updateItem['ship_to'],
                 'updated_by' => auth()->id(),
                 ]);
             }
@@ -616,7 +637,7 @@ class PlanCRUD extends Component
     }
     public function editAdd()
     {
-        $this->editItemDetails[] = ['id'=> '','customer'=>'' ,'issue' => '','po' => '', 'outpart' => '', 'quantity' => '','prize' => '','body' => '','ship_to'=>''];
+        $this->editItemDetails[] = ['id'=> '','customer'=>'' ,'issue' => '','po' => '','pr'=>'', 'outpart' => '', 'quantity' => '','prize' => '','body' => '','ship_to'=>''];
         $this->countEditItems = count($this->editItemDetails);
     }
 
@@ -624,7 +645,7 @@ class PlanCRUD extends Component
     {   
         $this->duplicateInput = false;
         $this->showEditModal = false;
-        $this->reset('editItemDetails');
+        $this->reset(['editItemDetails','eDuedate','eCar']);
         $this->reset('deleteItem');
         $this->resetValidation();
     }

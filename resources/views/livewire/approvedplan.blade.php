@@ -72,18 +72,20 @@
                                 Mark
                             </button>  
                             @endif
-                            
-                            <button wire:click.stop="export({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
-                                Export Tag
-                            </button>
-                            <button wire:click.stop="oracle({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
-                                Oracle
-                            </button>
                             @if(auth()->id() == $pland->created_by || auth()->user()->hasRole('superAdmin'))
                             <button wire:click.stop="openMoveModal({{ $pland->id }})" class="font-medium text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-red-300 text-sm px-3 py-1.5 me-2 mb-2">
                                 Move
                             </button>
-                            @endif
+                            @endif             
+                            <button wire:click.stop="export({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                Export Tag
+                            </button>
+                            <button wire:click.stop="oneoracle({{ $pland->id }})"  class="text-white bg-cyan-400 hover:bg-cyan-500  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                One
+                            </button>
+                            <button wire:click.stop="oracle({{ $pland->id }})"  class="text-white bg-sky-500 hover:bg-sky-600  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                Many
+                            </button>                     
                         </div>
                         
                     </div>
@@ -103,6 +105,9 @@
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         PO.
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        PR.
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         Outside part
@@ -135,6 +140,9 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ $listitem->po }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ $listitem->pr }}
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ $listitem->outpart }}

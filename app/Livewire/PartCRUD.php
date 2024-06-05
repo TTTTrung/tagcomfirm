@@ -54,7 +54,7 @@ class PartCRUD extends Component
     public function hideCreateModal()
     {   
         $this->showCreateModal = false;
-        $this->reset(['typee','partname','outpart','trupart','snp','weight','customer','wlh']);
+        $this->reset(['typee','partname','outpart','trupart','snp','weight','customer','wlh','ordertype','salerep','pricelist','bill_to']);
         $this->resetValidation();
     }
 
@@ -157,7 +157,7 @@ class PartCRUD extends Component
     {
         $this->showEditModal = false;
         $this->resetValidation();
-        $this->reset(['etypee','epartname','eoutpart','etrupart','esnp','eweight','evendor','ewlh']);
+        $this->reset(['etypee','epartname','eoutpart','etrupart','esnp','eweight','evendor','ewlh','eordertype','esalerep','epricelist','ebill_to']);
     }
 
     public function editPart()
