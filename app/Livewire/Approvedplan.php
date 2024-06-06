@@ -97,8 +97,8 @@ class Approvedplan extends Component
         try{
         $oracle = Plandue::with('listitems')->find($id);
         $summedItems = $oracle->listitems()
-        ->select('customer','outpart', 'po', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
-        ->groupBy('outpart', 'po','customer')
+        ->select('customer','outpart', 'po','pr', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
+        ->groupBy('outpart', 'po','customer','pr')
         ->get();
         
         $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
