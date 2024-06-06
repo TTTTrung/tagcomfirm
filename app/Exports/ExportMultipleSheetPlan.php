@@ -365,7 +365,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getColumnDimension('F')->setWidth(23);
                 $sheet->getColumnDimension('G')->setWidth(23);
                 $sheet->getColumnDimension('H')->setWidth(14);
-                $sheet->getColumnDimension('I')->setWidth(9);
+                $sheet->getColumnDimension('I')->setWidth(17);
                 $sheet->getColumnDimension('J')->setWidth(15);
                 $sheet->getColumnDimension('K')->setWidth(15);
                 $sheet->getColumnDimension('L')->setWidth(15);
