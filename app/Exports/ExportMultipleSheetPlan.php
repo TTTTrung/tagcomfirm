@@ -69,7 +69,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getColumnDimension('A')->setWidth(18);
                 $sheet->getColumnDimension('B')->setWidth(20);
                 $sheet->getColumnDimension('C')->setWidth(23);
-                $sheet->getColumnDimension('D')->setWidth(15);
+                $sheet->getColumnDimension('D')->setWidth(23);
                 $sheet->getColumnDimension('E')->setWidth(9);
                 $sheet->getColumnDimension('F')->setWidth(20);
                 $sheet->getColumnDimension('G')->setWidth(23);
@@ -78,7 +78,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getColumnDimension('J')->setWidth(20);
                 $sheet->getColumnDimension('K')->setWidth(20);
                 $sheet->getColumnDimension('L')->setWidth(15);
-                $sheet->getColumnDimension('M')->setWidth(12);
+                $sheet->getColumnDimension('M')->setWidth(18);
                 $sheet->getColumnDimension('N')->setWidth(12);
 
 
@@ -360,7 +360,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->getColumnDimension('A')->setWidth(8);
                 $sheet->getColumnDimension('B')->setWidth(20);
                 $sheet->getColumnDimension('C')->setWidth(23);
-                $sheet->getColumnDimension('D')->setWidth(20);
+                $sheet->getColumnDimension('D')->setWidth(24);
                 $sheet->getColumnDimension('E')->setWidth(20);
                 $sheet->getColumnDimension('F')->setWidth(23);
                 $sheet->getColumnDimension('G')->setWidth(23);
