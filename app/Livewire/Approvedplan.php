@@ -224,6 +224,82 @@ class Approvedplan extends Component
             }
         }
     }
+
+    public function ship($id){
+        // dd($id);
+        try{
+            $oracle = Plandue::with('listitems')->find($id);
+            $summedItems = $oracle->listitems()
+            ->select('customer','outpart', 'po','ship_to', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
+            ->groupBy('outpart', 'po','customer','ship_to')
+            ->get();
+            
+            $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
+            // dd($part->bill_to);
+            $checkExist = Opland::where('legacy_so_num','LIKE',$oracle->plan_id . '%')->first();
+            }catch(\Exception $e){
+                session()->flash('error', 'can not get plan id'); 
+            }
+            if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
+                session()->flash('error', 'Not enough data for oracle');
+            }
+            else{
+                if(empty($checkExist)){
+                DB::beginTransaction();
+                try{
+                $uniqueShip = $summedItems->pluck('ship_to')->unique();
+                
+                foreach($uniqueShip as $ship){
+        
+                    $part = Part::where('customer', $oracle->listitems->first()->customer)
+                    ->where('outpart', function ($query) use ($oracle, $ship) {
+                        $query->select('outpart')
+                              ->from('listitems') // Make sure 'list_items' is the correct table name
+                              ->where('ship_to', $ship)->first();
+                    })->first();
+                    if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
+                        session()->flash('error', 'Not enough data for oracle');
+                    }
+                $pland = Opland::create([
+                    'legacy_so_num' => ($oracle->plan_id)." ".($ship),
+                    'customer_no'=>$oracle->listitems->first()->customer,
+                    'bill_to'=>$part->bill_to,
+                    'transaction_type'=>$part->order_type,
+                    'order_date'=>$oracle->duedate,
+                    'price_list'=>$part->price_list,
+                    'salesperson'=>$part->sale_reps,
+                    'warehouse'=>'TRU',
+                    
+                ]);
+                $line = 1;
+                foreach ($summedItems->where('ship_to',$ship) as $item) {
+                    $filteredItem = $oracle->listitems->where('po', $item->po)->where('outpart', $item->outpart)->first();
+                    $pland->olist()->create([
+                        'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')->first(),
+                        'qty'=>$item->total_quantity,
+                        'price_unit'=>$item->total_price / $item->total_quantity,
+                        'customer_part_number'=> $item->outpart,
+                        'po_number'=>$item->po,
+                        'pr_number'=>$item->pr,
+                        'issue_number'=>$filteredItem->issue,
+                        'line_num'=> $line
+                    ]);
+                    $line += 1;     
+                    }
+                }
+                DB::commit();
+                session()->flash('success', ' Commit data to oracle succesfuly'); 
+                }catch(\Exception $e){
+                    DB::rollBack();
+                    session()->flash('error', 'can not insert data into oracle pls try again later.'); 
+                }
+            
+            }
+                else{
+                    session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
+                }
+            }
+    }
     
 public function render()
     {

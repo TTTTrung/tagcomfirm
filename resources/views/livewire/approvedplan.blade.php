@@ -85,6 +85,9 @@
                             </button>
                             <button wire:click.stop="oracle({{ $pland->id }})"  class="text-white bg-sky-500 hover:bg-sky-600  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                 Many
+                            </button> 
+                            <button wire:click.stop="ship({{ $pland->id }})"  class="text-white bg-sky-500 hover:bg-sky-600  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                Ship
                             </button>                     
                         </div>
                         
