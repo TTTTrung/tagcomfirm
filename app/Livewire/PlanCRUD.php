@@ -12,12 +12,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use PDOException;
 
 class PlanCRUD extends Component
 {
     use WithFileUploads;
+    use WithPagination; 
     public $showCreateModal = false;
     public $duedate;
     public $car;
