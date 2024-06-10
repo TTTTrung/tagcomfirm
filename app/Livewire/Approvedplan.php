@@ -30,6 +30,9 @@ class Approvedplan extends Component
     #[Url(history:true)]
     public $company = "";
 
+    #[Url(history:true)]
+    public $timedue = "";
+
     public $movemodal = false;
     public $planid;
     
@@ -311,6 +314,9 @@ public function render()
         })
         ->when($this->company !== "" , function($query){
             $query->where('company_name',$this->company);
+        })
+        ->when($this->timedue !== "",function($query){
+            $query->whereDate('duedate',$this->timedue);
         })
             ->searchpland($this->search)
             ->orderBy('id','desc')
