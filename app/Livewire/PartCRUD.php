@@ -163,10 +163,14 @@ class PartCRUD extends Component
     public function editPart()
     {
         $this->validate([
-        'evendor' => 'required|string',
-        'etypee' => 'required|string',
-        'epartname' => 'required|string',
-        'eoutpart' => 'required|string|unique:parts,outpart,' . $this->selectedPartData['id'],
+        'evendor' => 'required',
+        'etypee' => 'required',
+        'epartname' => 'required',
+        'eoutpart' => ['required',function($attribute , $value , $fail){
+            if(Part::where('customer',$this->evendor)->where('outpart',$value)->whereNot('id',$this->selectedPartData['id'])->exists()){
+                $fail("out part already exist");
+            }
+        }],
         'etrupart' => 'required|string',
         'esnp' => 'required|numeric|gt:0',
         'eweight' => 'required|numeric|gte:0',
