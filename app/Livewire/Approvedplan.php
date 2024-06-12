@@ -118,13 +118,10 @@ class Approvedplan extends Component
             try{
             $uniquePo = $summedItems->pluck('po')->unique();
             
-            foreach($uniquePo as $po){
-    
+            foreach($uniquePo as $index=>$po){
                 $part = Part::where('customer', $oracle->listitems->first()->customer)
-                ->where('outpart', function ($query) use ($oracle, $po) {
-                    $query->select('outpart')
-                          ->from('listitems') // Make sure 'list_items' is the correct table name
-                          ->where('po', $po)->first();
+                ->where('outpart', function ($query) use ($po,$id) {                  
+                   $query->select('outpart')->from('listitems')->where('po',$po)->where('plandue_id',$id)->first();
                 })->first();
                 if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
                     session()->flash('error', 'Not enough data for oracle');
