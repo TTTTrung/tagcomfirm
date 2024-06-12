@@ -95,7 +95,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 
                 foreach($this->test as $t)
                 {
-                    $weight = Part::where('outpart',$t->outpart)->first();
+                    $weight = Part::where('customer',$t->customer)->where('outpart',$t->outpart)->first();
                     $sheet->setCellValue("A{$currentRow}",$this->data->duedate);
                     $sheet->setCellValue("B{$currentRow}",$weight->type ?? null);
                     $sheet->setCellValue("C{$currentRow}",$t->outpart);
