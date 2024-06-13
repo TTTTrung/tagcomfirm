@@ -291,7 +291,7 @@ class PlanCRUD extends Component
                     
                     $index = explode('.', $attribute)[1];
                     $outpart = $this->itemDetails[$index]['outpart'] ?? null;
-                    $limit = Part::where('outpart', $outpart)->value('snp');
+                    $limit = Part::where('customer',$this->itemDetails[$index]['customer'])->where('outpart', $outpart)->value('snp');
                       if(is_null($limit)){
                         $fail("");
                       }
