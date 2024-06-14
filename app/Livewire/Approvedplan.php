@@ -100,8 +100,8 @@ class Approvedplan extends Component
         try{
         $oracle = Plandue::with('listitems')->find($id);
         $summedItems = $oracle->listitems()
-        ->select('customer','outpart', 'po','pr', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
-        ->groupBy('outpart', 'po','customer','pr')
+        ->select('customer','outpart','issue', 'po','pr', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
+        ->groupBy('outpart','issue', 'po','customer','pr')
         ->get();
         
         $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
@@ -140,7 +140,6 @@ class Approvedplan extends Component
             ]);
             $line = 1;
             foreach ($summedItems->where('po',$po) as $item) {
-                $filteredItem = $oracle->listitems->where('po', $po)->where('outpart', $item->outpart)->first();
                 $pland->olist()->create([
                     'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')->first(),
                     'qty'=>$item->total_quantity,
@@ -148,7 +147,7 @@ class Approvedplan extends Component
                     'customer_part_number'=> $item->outpart,
                     'po_number'=>$po,
                     'pr_number'=>$item->pr,
-                    'issue_number'=>$filteredItem->issue,
+                    'issue_number'=>$item->issue,
                     'line_num'=> $line
                 ]);
                 $line += 1;     
@@ -172,8 +171,8 @@ class Approvedplan extends Component
         try{
         $oracle = Plandue::with('listitems')->find($id);
         $summedItems = $oracle->listitems()
-        ->select('customer','outpart', 'po','pr', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
-        ->groupBy('outpart', 'po','customer','pr')
+        ->select('customer','outpart', 'issue','po','pr', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
+        ->groupBy('outpart', 'po','issue','customer','pr')
         ->get();
         $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
         $checkExist = Opland::where('legacy_so_num',$oracle->plan_id)->first();
@@ -199,7 +198,6 @@ class Approvedplan extends Component
                     'warehouse'=>'TRU', 
                 ]);
                  foreach ($summedItems as $index=>$item) {
-                $filteredItem = $oracle->listitems->where('po', $item->po)->where('outpart', $item->outpart)->first();
                 $pland->olist()->create([
                     'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')
                     ->first(),
@@ -208,7 +206,7 @@ class Approvedplan extends Component
                     'customer_part_number'=> $item->outpart,
                     'po_number'=>$item->po,
                     'pr_number'=>$item->pr,
-                    'issue_number'=>$filteredItem->issue,
+                    'issue_number'=>$item->issue,
                     'line_num'=> $index+1
                 ]);
                 DB::commit();
@@ -226,12 +224,11 @@ class Approvedplan extends Component
     }
 
     public function ship($id){
-        // dd($id);
         try{
             $oracle = Plandue::with('listitems')->find($id);
             $summedItems = $oracle->listitems()
-            ->select('customer','outpart', 'po','ship_to', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
-            ->groupBy('outpart', 'po','customer','ship_to')
+            ->select('customer','outpart','issue', 'po','ship_to', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
+            ->groupBy('outpart','issue', 'po','customer','ship_to')
             ->get();
             
             $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
@@ -273,7 +270,6 @@ class Approvedplan extends Component
                 ]);
                 $line = 1;
                 foreach ($summedItems->where('ship_to',$ship) as $item) {
-                    $filteredItem = $oracle->listitems->where('po', $item->po)->where('outpart', $item->outpart)->first();
                     $pland->olist()->create([
                         'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')->first(),
                         'qty'=>$item->total_quantity,
@@ -281,7 +277,7 @@ class Approvedplan extends Component
                         'customer_part_number'=> $item->outpart,
                         'po_number'=>$item->po,
                         'pr_number'=>$item->pr,
-                        'issue_number'=>$filteredItem->issue,
+                        'issue_number'=>$item->issue,
                         'line_num'=> $line
                     ]);
                     $line += 1;     
@@ -300,7 +296,14 @@ class Approvedplan extends Component
                 }
             }
     }
-    
+    public function test($id){
+        $oracle = Plandue::with('listitems')->find($id);
+        $summedItems = $oracle->listitems()
+            ->select('customer','outpart', 'issue','po','ship_to', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
+            ->groupBy('outpart','issue', 'po','customer','ship_to')
+            ->get();
+            dd($summedItems);
+    } 
 public function render()
     {
         $get_com = Plandue::whereNotNull('company_name')->distinct()->pluck('company_name');
@@ -321,4 +324,6 @@ public function render()
 
         return view('livewire.approvedplan',compact('plands','get_com'));
     }
+
+   
 }
