@@ -515,7 +515,7 @@
                                         <input wire:model="editItemDetails.{{ $rowIndex }}.po" type="text" class="w-full p-2 border border-gray-300 rounded text-xs" required />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editItemDetails.{{ $rowIndex }}.pr" type="text" class="w-full p-2 border border-gray-300 rounded text-xs" required />
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.pr" type="text" class="w-full p-2 border border-gray-300 rounded text-xs" />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="editItemDetails.{{ $rowIndex }}.outpart" type="text" class="w-full p-2 border border-gray-300 rounded text-xs" required />
