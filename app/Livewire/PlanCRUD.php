@@ -315,7 +315,7 @@ class PlanCRUD extends Component
                 'itemDetails.*.quantity.numeric' => 'Quantity must be numeric.',
                 'itemDetails.*.quantity.exceeds_limit' => 'The quantity exceeds the maximum limit for the outpart.',
             ]);
-        //  try{
+         try{
             $currentDate = Carbon::now()->format('Ymd');
             $latestRecord = Plandue::latest()->whereDate('created_at',$currentDate)->first();
             $counter = $latestRecord ? (int) substr($latestRecord->plan_id, -4) + 1 : 1;
@@ -363,40 +363,6 @@ class PlanCRUD extends Component
             foreach ($this->itemDetails as $item) {
                 $trupart = Part::where('customer',$item['customer'])->where('outpart',$item['outpart'])->first();
     
-
-                $price_list = DB::connection('oracle')
-                    ->select("SELECT 
-                    hca.account_number AS CUSTOMER_NUMBER,
-                    hp.party_name AS CUSTOMER_NAME,
-                    hcsu.price_list_id
-                FROM 
-                    AR.hz_parties hp
-                JOIN 
-                    AR.hz_cust_accounts hca ON hp.party_id = hca.party_id
-                LEFT JOIN 
-                    AR.hz_cust_acct_sites_all hcas ON hca.cust_account_id = hcas.cust_account_id
-                LEFT JOIN 
-                    AR.hz_party_sites hps ON hps.party_site_id = hcas.party_site_id
-                LEFT JOIN 
-                    AR.hz_cust_site_uses_all hcsu ON hcas.cust_acct_site_id = hcsu.cust_acct_site_id
-                LEFT JOIN 
-                    AR.hz_locations hl ON hps.location_id = hl.location_id
-                JOIN 
-                    APPS.hr_operating_units hou ON hcas.org_id = hou.organization_id
-                WHERE 
-                    hp.party_type = 'ORGANIZATION' 
-                    AND hp.status = 'A' 
-                    AND hps.status = 'A' 
-                    AND hcas.org_id = 84 
-                    AND hcsu.site_use_code = 'BILL_TO' 
-                    AND hca.account_number = {$item['customer']}
-                ORDER BY 
-                    hp.party_name, hca.account_number") ?? null;
-               
-
-                if (!empty($price_list)){
-                   
-                    
                 $price = DB::connection('oracle')->select("SELECT
                     QSLH.NAME AS M_PRICE_CODE,
                     MSI.SEGMENT1 AS M_ITEM_CODE,
@@ -415,11 +381,10 @@ class PlanCRUD extends Component
                     QPLL.END_DATE_ACTIVE IS NULL
                     AND MSI.ORGANIZATION_ID = 103
                     AND MSI.SEGMENT1 = '{$trupart->trupart}'
-                    AND QSLH.LIST_HEADER_ID = {$price_list[0] -> price_list_id}
+                    AND QSLH.NAME = '{$trupart->price_list}'
                 ORDER BY
                     M_ITEM_CODE") ?? 0;
-                }
-                // dd($item['pr']);
+
                 Listitem::create([
                     'plandue_id' => $plan->id,
                     'created_by' => auth()->id(),
@@ -437,11 +402,11 @@ class PlanCRUD extends Component
             $this->reset(['itemDetails','duedate','car']);
             $this->hideCreateModal();
             session()->flash('success', 'Plan create successfully.');
-        // }catch (\Exception $e)
-        //     {
-        //     $this->hideCreateModal();
-        //     session()->flash('error', 'An error occurred while create the plan.');  
-        //     }
+        }catch (\Exception $e)
+            {
+            $this->hideCreateModal();
+            session()->flash('error', 'An error occurred while create the plan.');  
+            }
         // } 
     }
 
