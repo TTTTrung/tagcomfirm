@@ -5,17 +5,12 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('landing') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                {{-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                </div> --}}
                 @role(['plAdmin','plSuperAdmin','superAdmin'])
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('plan')" :active="request()->routeIs('plan')">
@@ -30,9 +25,30 @@
                     </x-nav-link>
                 </div>
                 @endrole
+                @role(['plAdmin','plSuperAdmin','superAdmin','commoner'])
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('listplan')" :active="request()->routeIs('listplan')">
                         {{ __('ListPlan') }}
+                    </x-nav-link>
+                </div>
+                @endrole
+                @role(['scanner'])
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('scanconfirm')" :active="request()->routeIs('scanconfirm')">
+                        {{ __('Scanconfirm') }}
+                    </x-nav-link>
+                </div>
+                @endrole
+                @role(['lock'])
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('unlock')" :active="request()->routeIs('unlock')">
+                        {{ __('Unlock') }}
+                    </x-nav-link>
+                </div>
+                @endrole
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('historyscan')" :active="request()->routeIs('historyscan')">
+                        {{ __('History') }}
                     </x-nav-link>
                 </div>
                 @role(['superAdmin'])
@@ -92,12 +108,24 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
+        {{-- <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-        </div>
-
+        </div> --}}
+        @role(['scanner'])
+        <x-responsive-nav-link :href="route('scanconfirm')" :active="request()->routeIs('scanconfirm')">
+                {{ __('ScanConfirm') }}
+        </x-responsive-nav-link>
+        @endrole
+        @role(['lock'])
+        <x-responsive-nav-link :href="route('unlock')" :active="request()->routeIs('unlock')">
+                {{ __('Unlock') }}
+        </x-responsive-nav-link>
+        @endrole
+        <x-responsive-nav-link :href="route('historyscan')" :active="request()->routeIs('historyscan')">
+                {{ __('History') }}
+        </x-responsive-nav-link>
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">

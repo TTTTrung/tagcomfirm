@@ -91,6 +91,11 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 $sheet->setCellValue('A4','Approved By :');
                 $sheet->setCellValue('B4',$this->test2->name);
                 $sheet->setCellValue('K2','Go with: '.($this->data->go_with));
+                $sheet->mergeCells('L2:N4');
+                $sheet->setCellValue('L2',"*{$this->data->plan_id}*");
+                $sheet->getStyle("L2")->getFont()->setName('IDAutomationHC39M Free Version')->setSize(9);
+                $sheet->getStyle("L2")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle("L2")->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                 $currentRow = 7;
                 
                 foreach($this->test as $t)
@@ -195,14 +200,14 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
 
             // $sheet->setShowGridlines(false);    
             foreach ($this->test as $tt) {
-                    $sheet->getStyle("A{$count}:A" . ($count + 9))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("A{$count}:A" . ($count + 11))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THICK);
                     $sheet->getStyle("A{$count}:H{$count}")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
-                    $sheet->getStyle("H{$count}:H" . ($count + 9))->getBorders()->getRight()->setBorderStyle(Border::BORDER_THICK);
-                    $sheet->getStyle("A".($count + 9).":H".($count+ 9))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("H{$count}:H" . ($count + 11))->getBorders()->getRight()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("A".($count + 9).":H".($count+ 11))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK);
                     $sheet->getStyle("A{$count}:D{$count}")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                     $sheet->getStyle("E{$count}:E".($count + 2))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
                     // $sheet->getStyle("E".($count + 2).":H".($count + 2))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
-                    $sheet->getStyle("B".($count + 1).":B".($count + 9))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
+                    $sheet->getStyle("B".($count + 1).":B".($count + 8))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
                     $sheet->getStyle("A".($count + 1).":D".($count + 1))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                     $sheet->getStyle("A".($count + 2).":H".($count + 2))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                     $sheet->getStyle("A".($count + 3).":H".($count + 3))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
@@ -253,6 +258,11 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     // $drawing = new Drawing();
                     // $drawing->setPath("D:/J1A-F217G-00-00-80.jpg");
                     // $drawing->setCoordinates("D".($count + 5));
+                    $sheet->mergeCells("A".($count + 9). ":C".($count +11));
+                    $sheet->setCellValue("A".($count + 9),"    *{$tt->quantity}*    ");
+                     $sheet->getStyle("A".($count+9))->getFont()->setName('IDAutomationHC39M Free Version')->setSize(11);
+                    $sheet->getStyle("A".($count+9))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle("A".($count+9))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                     $count += 13;   
                     
                 }
