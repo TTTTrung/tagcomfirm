@@ -13,12 +13,11 @@ use Spatie\Permission\Models\Role;
 
 class Scancheck extends Component
 {
-    public $companys =['BKG']; 
+    public $companys =['BKC']; 
     public $company;
     public $planid;
     public $scan =['outside'=>'','partT'=>'','qty'=>'']; 
     public function scanchoice(){
-        // dd($this->scan);
        $this->validate([
             'companys' => ['required'],
             'planid' => ['required'],
@@ -26,11 +25,9 @@ class Scancheck extends Component
             'scan.partT' => ['required'],
             'scan.qty' => ['required']
        ]);
-       if ($this->company == "BKG"){
-        // dd('test');
+       if ($this->company == "BKC"){
         return $this->bkc($this->planid,$this->scan);
        }
-       dd('fail');
     }
 
     public function bkc($id,$scan){
