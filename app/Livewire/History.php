@@ -11,7 +11,7 @@ class History extends Component
    use WithPagination; 
 
     public function render()
-    {   $historys = ModelsHistory::with(['createdBy','updatedBy'])->paginate(10);
+    {   $historys = ModelsHistory::with(['createdBy','updatedBy'])->orderBy('id','desc')->paginate(10);
         return view('livewire.history',compact('historys'));
     }
 }
