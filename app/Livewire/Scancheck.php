@@ -51,7 +51,7 @@ class Scancheck extends Component
     //     ->get());
     // dd($scan['partT']);
     if (Part::where('customer', '20062')
-        ->where('outpart', $outpart[1])
+        ->where('outpart', $outpart[1] ?? null)
         ->where('trupart', $scan['partT'])
         ->exists() && !is_null($pallet)) {
         $pallet->update(['flag' => true]);
@@ -59,7 +59,7 @@ class Scancheck extends Component
         History::create([
             'planid' => $id,
             'customer' => '20062',
-            'outside' => $outpart[1] ?? null, // Ensure this value exists
+            'outside' => $outpart[1] ?? null,// Ensure this value exists
             'thpart' => $scan['partT'],
             'qty' => $scan['qty'],
             'status' => 'success',
