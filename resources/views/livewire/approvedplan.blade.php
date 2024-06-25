@@ -130,6 +130,9 @@
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         Ship to
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        status 
                                     </th>                                             
                                 </tr>
                             </thead>
@@ -167,6 +170,17 @@
                                     <td class="px-6 py-4">
                                         {{ $listitem->ship_to }}
                                     </td>
+                                    @if ($listitem->flag == true)
+                                    <td class="px-6 py-4 justify-center">
+                                    <span class="flex w-3 h-3 me-3 bg-green-500 rounded-full"></span>
+                                    </td> 
+                                    @else
+                                    <td class="px-6 py-4 justify-center">
+                                        <div>
+                                            <span class="flex w-3 h-3 me-3 bg-red-500 rounded-full"></span>
+                                        </div>
+                                    </td> 
+                                    @endif
                                 </tr>   
                             @endforeach
                         </table>
