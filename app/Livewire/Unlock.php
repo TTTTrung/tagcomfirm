@@ -20,7 +20,7 @@ class Unlock extends Component
             'description' => ['required']
         ]);
         $user = User::where('email',$this->email)->first();
-        if ($user && Hash::check($this->password,$user->password) && in_array('plSuperAdmin',$user->getRoleNames()->toArray()) || in_array('superAdmin',$user->getRoleNames()->toArray()) )
+        if ($user && Hash::check($this->password,$user->password) && in_array('plSuperAdmin',$user->getRoleNames()->toArray()) || in_array('superAdmin',$user->getRoleNames()->toArray())|| in_array('unlocker',$user->getRoleNames()->toArray()) )
         {
             try{ 
             $history = History::where('created_by',auth()->id())->latest()->take(1)->first();

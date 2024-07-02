@@ -13,7 +13,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = ['scanner', 'commoner', 'plAdmin', 'plSuperAdmin', 'superAdmin'];
+        $roles = ['scanner', 'commoner', 'plAdmin', 'plSuperAdmin', 'superAdmin','unlocker','lock'];
 
         foreach ($roles as $roleName) {
         // Check if a role with the current name already exists

@@ -5,10 +5,12 @@ namespace App\Livewire;
 use App\Models\User;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class CRUDuser extends Component
 {
@@ -100,7 +102,9 @@ class CRUDuser extends Component
             'email' => $this->edEmail,
             'name' => $this->edName,
         ]);
-        $this->selectedUser->syncRoles([$this->edSelectedRoles]);
+            $user = User::find($this->selectedUser->id);
+            $role = Role::findOrCreate($this->edSelectedRoles);
+            $user->syncRoles($role);
         session()->flash('success', 'User update successfully.');
         $this->hideEditModal();
         }catch (\Exception $e){

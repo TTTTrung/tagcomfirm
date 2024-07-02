@@ -150,6 +150,7 @@
                         <option value="plAdmin">PlAdmin</option>
                         <option value="plSuperAdmin">plSuperAdmin</option>
                         <option value="commoner">commoner</option>
+                        <option value="unlocker">unlocker</option>
                         </select>
                         @error('selectedRoles') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
@@ -207,6 +208,7 @@
                         <option value="plAdmin">PlAdmin</option>
                         <option value="plSuperAdmin">plSuperAdmin</option>
                         <option value="commoner">commoner</option>
+                        <option value="unlocker">unlocker</option>
                         </select>
                         @error('edSelectedRoles') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
