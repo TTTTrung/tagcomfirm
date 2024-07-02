@@ -22,19 +22,19 @@ class Unlock extends Component
         $user = User::where('email',$this->email)->first();
         if ($user && Hash::check($this->password,$user->password) && in_array('plSuperAdmin',$user->getRoleNames()->toArray()) || in_array('superAdmin',$user->getRoleNames()->toArray()) )
         {
-           try{ 
+            try{ 
             $history = History::where('created_by',auth()->id())->latest()->take(1)->first();
             $history->update([
                 'description'=> $this->description,
-                'updated_by'=> auth()->id()
-            ]);
+                'updated_by'=> $user->id,
+                 ]);
             $userId = Auth::id();
             $user = User::find($userId);
             $user->syncRoles('scanner');
             return redirect()->route('scanconfirm')->with('success','unlock user success');
-        }catch(\Exception $e){
-            session()->flash('error','somthing went wrong');
-        }
+         }catch(\Exception $e){
+             session()->flash('error','somthing went wrong');
+         }
         }
         else{
             session()->flash('erro','user or password incorrect');
