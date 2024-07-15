@@ -125,7 +125,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $currentRow += 1;
 
                 }
-                
+            
             }
             public function registerEvents(): array
             {
@@ -139,6 +139,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $event->sheet->getPageMargins()->setBottom(0.5);
                     $event->sheet->getPageMargins()->setLeft(0.5);
                     $event->sheet->getPageMargins()->setRight(0.5);
+                    $event->sheet->getDelegate()->getHeaderFooter()->setOddFooter('PLD-FM-005 Rev.00 26/6/24');
                  },
                     ];
             }
@@ -452,6 +453,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $event->sheet->getPageMargins()->setBottom(0.5);
                     $event->sheet->getPageMargins()->setLeft(0.5);
                     $event->sheet->getPageMargins()->setRight(0.5);
+                    $event->sheet->getDelegate()->getHeaderFooter()->setOddFooter('PLD-FM-005 Rev.00 26/6/24');
                 },
                     ];
             }

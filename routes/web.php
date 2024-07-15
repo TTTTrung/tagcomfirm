@@ -29,6 +29,7 @@ Route::get('/', function () {
 });
 
 Route::get('', fn()=> to_route('landing'));
+Route::get('/dashboard',fn()=> to_route('landing'));
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
