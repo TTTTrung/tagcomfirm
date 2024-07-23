@@ -58,7 +58,6 @@ class Approvedplan extends Component
 
     public function markDone($id,$status)
     {
-        
         try{
             if($status == 'approved'){
                 Plandue::where('id',$id)->update(['status'=>'done']);
@@ -69,8 +68,6 @@ class Approvedplan extends Component
 
         }
     }
-
-   
 
     public function openMoveModal($id) {
         $this->planid = $id;
@@ -89,8 +86,6 @@ class Approvedplan extends Component
         }
     }
 
-
-
     public function closeMoveModal(){
         $this->movemodal = false;
         $this->reset(['planid']);
@@ -100,10 +95,32 @@ class Approvedplan extends Component
         try{
         $oracle = Plandue::with('listitems')->find($id);
         $summedItems = $oracle->listitems()
-        ->select('customer','outpart','issue', 'po','pr', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
-        ->groupBy('outpart','issue', 'po','customer','pr')
-        ->get();
-        
+            ->select(
+                'listitems.customer',
+                'listitems.outpart',
+                'listitems.issue',
+                'listitems.po',
+                'listitems.pr',
+                DB::raw('SUM(listitems.quantity) as total_quantity'),
+                DB::raw('SUM(listitems.prize) as total_price'),
+                'parts.sale_reps' 
+            )
+            ->join('parts', function($join) {
+                $join->on('listitems.outpart', '=', 'parts.outpart')
+                    ->on('listitems.customer', '=', 'parts.customer');
+            })
+            ->groupBy(
+                'listitems.customer',
+                'listitems.outpart',
+                'listitems.issue',
+                'listitems.po',
+                'listitems.pr',
+                'parts.sale_reps'
+            )
+            ->get();
+        $groupedItems = $summedItems->groupBy(function($item) {
+            return $item->po . "~" . $item->sale_reps;
+        }); 
         $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
         $checkExist = Opland::where('legacy_so_num','LIKE',$oracle->plan_id . '%')->first();
         }catch(\Exception $e){
@@ -116,36 +133,31 @@ class Approvedplan extends Component
             if(empty($checkExist)){
             DB::beginTransaction();
             try{
-            $uniquePo = $summedItems->pluck('po')->unique();
-            
-            foreach($uniquePo as $index=>$po){
-                $part = Part::where('customer', $oracle->listitems->first()->customer)
-                ->where('outpart', function ($query) use ($po,$id) {                  
-                   $query->select('outpart')->from('listitems')->where('po',$po)->where('plandue_id',$id)->first();
-                })->first();
+            foreach($groupedItems as $key=>$items){
+                $part = Part::where('customer',$oracle->listitems->first()->customer)
+                ->where('outpart',$items->first()->outpart)->first(); 
                 if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
                     session()->flash('error', 'Not enough data for oracle');
                 }
             $pland = Opland::create([
-                'legacy_so_num' => ($oracle->plan_id)." ".($po),
+                'legacy_so_num' => ($oracle->plan_id)." ".($key),
                 'customer_no'=>$oracle->listitems->first()->customer,
                 'bill_to'=>$part->bill_to,
                 'transaction_type'=>$part->order_type,
                 'order_date'=>$oracle->duedate,
                 'price_list'=>$part->price_list,
                 'salesperson'=>$part->sale_reps,
-                'customer_po_no' => $po,
+                'customer_po_no' => $items->first()->po,
                 'warehouse'=>'TRU',
-                
             ]);
             $line = 1;
-            foreach ($summedItems->where('po',$po) as $item) {
+            foreach ($items as $item) {
                 $pland->olist()->create([
                     'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')->first(),
                     'qty'=>$item->total_quantity,
                     'price_unit'=>$item->total_price / $item->total_quantity,
                     'customer_part_number'=> $item->outpart,
-                    'po_number'=>$po,
+                    'po_number'=>$item->po,
                     'pr_number'=>$item->pr,
                     'issue_number'=>$item->issue,
                     'line_num'=> $line
@@ -159,7 +171,6 @@ class Approvedplan extends Component
                 DB::rollBack();
                 session()->flash('error', 'can not insert data into oracle pls try again later.'); 
             }
-        
         }
             else{
                 session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
@@ -171,9 +182,32 @@ class Approvedplan extends Component
         try{
         $oracle = Plandue::with('listitems')->find($id);
         $summedItems = $oracle->listitems()
-        ->select('customer','outpart', 'issue','po','pr', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
-        ->groupBy('outpart', 'po','issue','customer','pr')
-        ->get();
+            ->select(
+                'listitems.customer',
+                'listitems.outpart',
+                'listitems.issue',
+                'listitems.po',
+                'listitems.pr',
+                DB::raw('SUM(listitems.quantity) as total_quantity'),
+                DB::raw('SUM(listitems.prize) as total_price'),
+                'parts.sale_reps' 
+            )
+            ->join('parts', function($join) {
+                $join->on('listitems.outpart', '=', 'parts.outpart')
+                    ->on('listitems.customer', '=', 'parts.customer');
+            })
+            ->groupBy(
+                'listitems.customer',
+                'listitems.outpart',
+                'listitems.issue',
+                'listitems.po',
+                'listitems.pr',
+                'parts.sale_reps'
+            )
+            ->get();
+        $groupedItems = $summedItems->groupBy(function($item) {
+            return $item->sale_reps;
+        }); 
         $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
         $checkExist = Opland::where('legacy_so_num',$oracle->plan_id)->first();
         } catch(\Exception $e){
@@ -186,9 +220,11 @@ class Approvedplan extends Component
         else{
             if(empty($checkExist)){
                 try{
-                $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
+                foreach($groupedItems as  $key => $items){
+                $part = Part::where('customer',$oracle->listitems->first()->customer)
+                ->where('outpart',$items->first()->outpart)->first();
                 $pland = Opland::create([
-                    'legacy_so_num' => $oracle->plan_id,
+                    'legacy_so_num' => $oracle->plan_id . " " . $key ,
                     'customer_no'=>$oracle->listitems->first()->customer,
                     'bill_to'=>$part->bill_to,
                     'transaction_type'=>$part->order_type,
@@ -197,7 +233,7 @@ class Approvedplan extends Component
                     'salesperson'=>$part->sale_reps,
                     'warehouse'=>'TRU', 
                 ]);
-                 foreach ($summedItems as $index=>$item) {
+                 foreach ($items as $index=>$item) {
                 $pland->olist()->create([
                     'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')
                     ->first(),
@@ -209,9 +245,11 @@ class Approvedplan extends Component
                     'issue_number'=>$item->issue,
                     'line_num'=> $index+1
                 ]);
+                }
+                }
                 DB::commit();
                 session()->flash('success', ' Commit data to oracle succesfuly');
-                }
+                
                 }catch(\Exception $e){
                     DB::rollBack();
                     session()->flash('error', 'can not insert data into oracle pls try again later.'); 
@@ -227,10 +265,32 @@ class Approvedplan extends Component
         try{
             $oracle = Plandue::with('listitems')->find($id);
             $summedItems = $oracle->listitems()
-            ->select('customer','outpart','issue', 'po','ship_to', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(prize) as total_price'))
-            ->groupBy('outpart','issue', 'po','customer','ship_to')
+            ->select(
+                'listitems.customer',
+                'listitems.outpart',
+                'listitems.issue',
+                'listitems.po',
+                'listitems.ship_to',
+                DB::raw('SUM(listitems.quantity) as total_quantity'),
+                DB::raw('SUM(listitems.prize) as total_price'),
+                'parts.sale_reps' 
+            )
+            ->join('parts', function($join) {
+                $join->on('listitems.outpart', '=', 'parts.outpart')
+                    ->on('listitems.customer', '=', 'parts.customer');
+            })
+            ->groupBy(
+                'listitems.customer',
+                'listitems.outpart',
+                'listitems.issue',
+                'listitems.po',
+                'listitems.ship_to',
+                'parts.sale_reps'
+            )
             ->get();
-            
+            $groupedItems = $summedItems->groupBy(function($item) {
+                return $item->ship_to . '~' . $item->sale_reps;
+            }); 
             $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
             // dd($part->bill_to);
             $checkExist = Opland::where('legacy_so_num','LIKE',$oracle->plan_id . '%')->first();
@@ -244,21 +304,22 @@ class Approvedplan extends Component
                 if(empty($checkExist)){
                 DB::beginTransaction();
                 try{
-                $uniqueShip = $summedItems->pluck('ship_to')->unique();
-                
-                foreach($uniqueShip as $ship){
-        
-                    $part = Part::where('customer', $oracle->listitems->first()->customer)
-                    ->where('outpart', function ($query) use ($oracle, $ship) {
-                        $query->select('outpart')
-                              ->from('listitems') // Make sure 'list_items' is the correct table name
-                              ->where('ship_to', $ship)->first();
-                    })->first();
+                // $uniqueShip = $summedItems->pluck('ship_to')->unique();
+                foreach($groupedItems as $key => $items){
+                    // $part = Part::where('customer', $oracle->listitems->first()->customer)
+                    // ->where('outpart', function ($query) use ($oracle, $items) {
+                    //     $query->select('outpart')
+                    //           ->from('listitems') // Make sure 'list_items' is the correct table name
+                    //           ->where('ship_to', $items->first())->first();
+                    // })->first();
+                    $part = Part::where('customer',$oracle->listitems->first()->customer)
+                            ->where('outpart',$items->first()->outpart)->first();
+
                     if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
                         session()->flash('error', 'Not enough data for oracle');
                     }
                 $pland = Opland::create([
-                    'legacy_so_num' => ($oracle->plan_id)." ".($ship),
+                    'legacy_so_num' => ($oracle->plan_id)." ".($key),
                     'customer_no'=>$oracle->listitems->first()->customer,
                     'bill_to'=>$part->bill_to,
                     'transaction_type'=>$part->order_type,
@@ -269,7 +330,7 @@ class Approvedplan extends Component
                     
                 ]);
                 $line = 1;
-                foreach ($summedItems->where('ship_to',$ship) as $item) {
+                foreach ($items as $item) {
                     $pland->olist()->create([
                         'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')->first(),
                         'qty'=>$item->total_quantity,
@@ -287,7 +348,8 @@ class Approvedplan extends Component
                 session()->flash('success', ' Commit data to oracle succesfuly'); 
                 }catch(\Exception $e){
                     DB::rollBack();
-                    session()->flash('error', 'can not insert data into oracle pls try again later.'); 
+                    session()->flash('error', 
+                    'can not insert data into oracle pls try again later.'); 
                 }
             
             }

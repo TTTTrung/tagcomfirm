@@ -30,4 +30,9 @@ class Listitem extends Model
     {
         return $query->where('issue', 'like', "%{$value}%");
     }
+    public function part():BelongsTo{
+        return $this->belongsTo(Part::class)
+                ->whereColumn('listitems.outpart','parts.outpart')
+                ->whereColumn('listitems.customer','parts.customer'); 
+    }
 }
