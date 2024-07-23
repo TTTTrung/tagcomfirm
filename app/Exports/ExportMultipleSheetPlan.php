@@ -11,11 +11,15 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Milon\Barcode\DNS1D;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use File;
+use Illuminate\Database\Eloquent\Collection;
+use Milon\Barcode\DNS2D;
 
 class ExportMultipleSheetPlan implements WithMultipleSheets
 {
@@ -201,10 +205,12 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
 
             // $sheet->setShowGridlines(false);    
             foreach ($this->test as $tt) {
+
+                   
                     $sheet->getStyle("A{$count}:A" . ($count + 11))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THICK);
-                    $sheet->getStyle("A{$count}:H{$count}")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
-                    $sheet->getStyle("H{$count}:H" . ($count + 11))->getBorders()->getRight()->setBorderStyle(Border::BORDER_THICK);
-                    $sheet->getStyle("A".($count + 9).":H".($count+ 11))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("A{$count}:J{$count}")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("J{$count}:J" . ($count + 11))->getBorders()->getRight()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("A".($count + 9).":J".($count+ 11))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK);
                     $sheet->getStyle("A{$count}:D{$count}")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                     $sheet->getStyle("E{$count}:E".($count + 2))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
                     // $sheet->getStyle("E".($count + 2).":H".($count + 2))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
@@ -249,21 +255,57 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->getStyle("B".($count + 6))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                     $sheet->getStyle("B".($count + 6))->getFont()->setSize(16);
                 
-                    $sheet->mergeCells("E{$count}:H".($count+2));
-                    $sheet->setCellValue("E".($count),"*{$trupart}*" );
-                    $sheet->getStyle("E".($count))->getFont()->setName('IDAutomationHC39M Free Version')->setSize(9);
-                    $sheet->getStyle("E".($count))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                    $sheet->getStyle("E".($count))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                    $sheet->mergeCells("D".($count + 4).":H".($count + 4));
+                    $sheet->setCellValue("D".($count + 4),$trupart); 
+                    $sheet->getStyle("D".($count + 4))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle("D".($count + 4))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
+                    $sheet->mergeCells("E{$count}:H".($count+2));
+                    $barcode = new DNS1D();
+                    $barcode->setStorPath(__DIR__ . '/cache/');
+                    $barcodeImage = $barcode->getBarcodePNGPath($trupart,'C128',2,100,array(1,1,1), true);
+
+                    $barcodeDrawing = new Drawing();
+                    $barcodeDrawing->setName($trupart);
+                    $barcodeDrawing->setDescription($trupart); 
+                    $barcodeDrawing->setPath($barcodeImage);
+                    $barcodeDrawing->setCoordinates('E'.($count));
+                    $barcodeDrawing->setWidth(245);
+                    $barcodeDrawing->setHeight(50);
+                    $barcodeDrawing->setWorksheet($sheet);
+
+
+                    $qrCode = new DNS2D();
+                    $qrCode->setStorPath(__DIR__.'/cache/');
+                    $qrcodeImagePath = $qrCode->getBarcodePNGPath(
+                    collect($tt)->only(['outpart','po','pr','quantity'])->toJson()
+                    , 'QRCODE', 3, 3);
+                    $qrCodeDrawing = new Drawing();
+                    $qrCodeDrawing->setName($trupart);
+                    $qrCodeDrawing->setDescription($trupart); 
+                    $qrCodeDrawing->setPath($qrcodeImagePath);
+                    $qrCodeDrawing->setCoordinates('I'.($count + 1));
+                    $qrCodeDrawing->setWorksheet($sheet);
                     $sheet->mergeCells("D".($count + 5).":H".($count + 8));
                     // $drawing = new Drawing();
                     // $drawing->setPath("D:/J1A-F217G-00-00-80.jpg");
                     // $drawing->setCoordinates("D".($count + 5));
-                    $sheet->mergeCells("A".($count + 9). ":C".($count +11));
-                    $sheet->setCellValue("A".($count + 9),"    *{$tt->quantity}*    ");
-                     $sheet->getStyle("A".($count+9))->getFont()->setName('IDAutomationHC39M Free Version')->setSize(11);
-                    $sheet->getStyle("A".($count+9))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                    $sheet->getStyle("A".($count+9))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                     $barcode = new DNS1D();
+                    $barcode->setStorPath(__DIR__ . '/cache/');
+                    $barcodeImage = $barcode->getBarcodePNGPath("$tt->quantity",'C128',2,100,array(1,1,1), true);
+
+                    $barcodeDrawing = new Drawing();
+                    $barcodeDrawing->setName($tt->quantity);
+                    $barcodeDrawing->setDescription($tt->quantity); 
+                    $barcodeDrawing->setPath($barcodeImage);
+                    $barcodeDrawing->setCoordinates('B'.($count+9));
+                    $barcodeDrawing->setWidth(245);
+                    $barcodeDrawing->setHeight(50);
+                    $barcodeDrawing->setWorksheet($sheet);
+                    // $sheet->setCellValue("A".($count + 9),"    *{$tt->quantity}*    ");
+                    //  $sheet->getStyle("A".($count+9))->getFont()->setName('IDAutomationHC39M Free Version')->setSize(11);
+                    // $sheet->getStyle("A".($count+9))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    // $sheet->getStyle("A".($count+9))->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                     $count += 13;   
                     
                 }
@@ -278,8 +320,8 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
 
                         $event->sheet->getPageMargins()->setTop(0.5);
                         $event->sheet->getPageMargins()->setBottom(0.5);
-                        $event->sheet->getPageMargins()->setLeft(0.5);
-                        $event->sheet->getPageMargins()->setRight(0.5);
+                        $event->sheet->getPageMargins()->setLeft(0.1);
+                        $event->sheet->getPageMargins()->setRight(0.1);
                     }
                 ];
             }
