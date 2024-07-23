@@ -207,10 +207,10 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
             foreach ($this->test as $tt) {
 
                    
-                    $sheet->getStyle("A{$count}:A" . ($count + 11))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("A{$count}:A" . ($count + 9))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THICK);
                     $sheet->getStyle("A{$count}:J{$count}")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THICK);
-                    $sheet->getStyle("J{$count}:J" . ($count + 11))->getBorders()->getRight()->setBorderStyle(Border::BORDER_THICK);
-                    $sheet->getStyle("A".($count + 9).":J".($count+ 11))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("J{$count}:J" . ($count + 9))->getBorders()->getRight()->setBorderStyle(Border::BORDER_THICK);
+                    $sheet->getStyle("A".($count + 9).":J".($count+ 9))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK);
                     $sheet->getStyle("A{$count}:D{$count}")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                     $sheet->getStyle("E{$count}:E".($count + 2))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
                     // $sheet->getStyle("E".($count + 2).":H".($count + 2))->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
@@ -249,7 +249,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->setCellValue("B".($count + 5),$tt->ship_to);
 
                     $sheet->setCellValue("A".($count + 7),'QTY');
-                    $sheet->mergeCells("B" . ($count + 6) . ":C" . ($count + 8));
+                    $sheet->mergeCells("B" . ($count + 6) . ":B" . ($count + 8));
                     $sheet->setCellValue("B".($count + 6),$tt->quantity);
                     $sheet->getStyle("B".($count + 6))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("B".($count + 6))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
@@ -284,7 +284,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $qrCodeDrawing->setName($trupart);
                     $qrCodeDrawing->setDescription($trupart); 
                     $qrCodeDrawing->setPath($qrcodeImagePath);
-                    $qrCodeDrawing->setCoordinates('I'.($count + 1));
+                    $qrCodeDrawing->setCoordinates('I'.($count));
                     $qrCodeDrawing->setWorksheet($sheet);
                     $sheet->mergeCells("D".($count + 5).":H".($count + 8));
                     // $drawing = new Drawing();
@@ -298,7 +298,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $barcodeDrawing->setName($tt->quantity);
                     $barcodeDrawing->setDescription($tt->quantity); 
                     $barcodeDrawing->setPath($barcodeImage);
-                    $barcodeDrawing->setCoordinates('B'.($count+9));
+                    $barcodeDrawing->setCoordinates('C'.($count+6));
                     $barcodeDrawing->setWidth(245);
                     $barcodeDrawing->setHeight(50);
                     $barcodeDrawing->setWorksheet($sheet);
