@@ -256,7 +256,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->getStyle("B".($count + 6))->getFont()->setSize(16);
                 
                     $sheet->mergeCells("D".($count + 4).":H".($count + 4));
-                    $sheet->setCellValue("D".($count + 4),$trupart); 
+                    $sheet->setCellValue("D".($count + 4),$tt->outpart); 
                     $sheet->getStyle("D".($count + 4))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("D".($count + 4))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
