@@ -263,11 +263,11 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->mergeCells("E{$count}:H".($count+2));
                     $barcode = new DNS1D();
                     $barcode->setStorPath(__DIR__ . '/cache/');
-                    $barcodeImage = $barcode->getBarcodePNGPath($trupart,'C128',2,100,array(1,1,1), true);
+                    $barcodeImage = $barcode->getBarcodePNGPath($tt->outpart,'C128',2,100,array(1,1,1), true);
 
                     $barcodeDrawing = new Drawing();
-                    $barcodeDrawing->setName($trupart);
-                    $barcodeDrawing->setDescription($trupart); 
+                    $barcodeDrawing->setName($tt->outpart);
+                    $barcodeDrawing->setDescription($tt->outpart); 
                     $barcodeDrawing->setPath($barcodeImage);
                     $barcodeDrawing->setCoordinates('E'.($count));
                     $barcodeDrawing->setWidth(245);
@@ -281,8 +281,8 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     collect($tt)->only(['outpart','po','pr','quantity'])->toJson()
                     , 'QRCODE', 3, 3);
                     $qrCodeDrawing = new Drawing();
-                    $qrCodeDrawing->setName($trupart);
-                    $qrCodeDrawing->setDescription($trupart); 
+                    $qrCodeDrawing->setName($tt->outpart);
+                    $qrCodeDrawing->setDescription($tt->outpart); 
                     $qrCodeDrawing->setPath($qrcodeImagePath);
                     $qrCodeDrawing->setCoordinates('I'.($count));
                     $qrCodeDrawing->setWorksheet($sheet);
