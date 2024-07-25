@@ -96,6 +96,7 @@ class Approvedplan extends Component
         $oracle = Plandue::with('listitems')->find($id);
         $summedItems = $oracle->listitems()
             ->select(
+                DB::raw('MIN(listitems.id) as first_id'),
                 'listitems.customer',
                 'listitems.outpart',
                 'listitems.issue',
@@ -116,7 +117,7 @@ class Approvedplan extends Component
                 'listitems.po',
                 'listitems.pr',
                 'parts.sale_reps'
-            )
+            )->orderBy('first_id')
             ->get();
         $groupedItems = $summedItems->groupBy(function($item) {
             return $item->po . "~" . $item->sale_reps;
@@ -183,6 +184,7 @@ class Approvedplan extends Component
         $oracle = Plandue::with('listitems')->find($id);
         $summedItems = $oracle->listitems()
             ->select(
+                DB::raw('MIN(listitems.id) as first_id'),
                 'listitems.customer',
                 'listitems.outpart',
                 'listitems.issue',
@@ -203,7 +205,7 @@ class Approvedplan extends Component
                 'listitems.po',
                 'listitems.pr',
                 'parts.sale_reps'
-            )
+            )->orderBy('first_id')
             ->get();
         $groupedItems = $summedItems->groupBy(function($item) {
             return $item->sale_reps;
@@ -266,6 +268,7 @@ class Approvedplan extends Component
             $oracle = Plandue::with('listitems')->find($id);
             $summedItems = $oracle->listitems()
             ->select(
+                DB::raw('MIN(listitems.id) as first_id'),
                 'listitems.customer',
                 'listitems.outpart',
                 'listitems.issue',
@@ -286,8 +289,9 @@ class Approvedplan extends Component
                 'listitems.po',
                 'listitems.ship_to',
                 'parts.sale_reps'
-            )
+            )->orderBy('first_id')
             ->get();
+            
             $groupedItems = $summedItems->groupBy(function($item) {
                 return $item->ship_to . '~' . $item->sale_reps;
             }); 
