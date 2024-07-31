@@ -10,7 +10,17 @@ class History extends Model
     use HasFactory;
 
     protected $table ="historys";
-    protected $fillable = ['planid','customer','outside','thpart','qty','status','created_by','updated_by','description'];
+    protected $fillable = 
+    ['planid',
+    'customer',
+    'outside',
+    'thpart',
+    'qty',
+    'status',
+    'created_by',
+    'updated_by',
+    'description',
+    'issue'];
     
     public function createdBy()
     {

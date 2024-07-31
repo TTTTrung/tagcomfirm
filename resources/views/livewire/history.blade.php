@@ -16,6 +16,9 @@
                                 <th scope="col" class="px-6 py-3">
                                     Plan Id.
                                 </th>
+                                 <th scope="col" class="px-6 py-3">
+                                    Issue 
+                                </th>
                                 <th scope="col" class="px-6 py-3">
                                     Outside part
                                 </th>
@@ -50,7 +53,11 @@
                                 </th>
                                 
                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                    {{ $history->planid }}</th>
+                                    {{ $history->planid }}
+                                </th>
+                                <td class="px-6 py-4">
+                                    {{ $history->issue}}
+                                </td>
                                 <td class="px-6 py-4">
                                     {{ $history->outside }}
                                 </td>

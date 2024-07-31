@@ -29,6 +29,7 @@
                         <div class="mb-5">
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">select company</label>
                         <select wire:model.live="company"
+                        wire:change="updateCompany"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                         <option value="">All</option>
                         @foreach ($companys as $company)
@@ -38,19 +39,40 @@
                         </div>
                         <div class="mb-5">
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">plan id</label>
-                        <input wire:model="planid" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" required />
+                        <input wire:model="planid" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" />
+                         @error('planid') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
                         </div>
+                        @if ($issueCheck)
+                        <div class="mb-5">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Issue</label>
+                        <input wire:model="scan.issue" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" />
+                         @error('scan.issue') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror 
+                        </div> 
+                        @endif
                         <div class="mb-5">
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Outside</label>
-                        <input wire:model="scan.outside" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" required />
+                        <input wire:model="scan.outside" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" />
+                        @error('scan.outside') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror 
                         </div>
                         <div class="mb-5">
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Part thairung</label>
-                        <input wire:model="scan.partT" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" required />
+                        <input wire:model="scan.partT" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" />
+                        @error('scan.partT') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror 
                         </div>
                        <div class="mb-5">
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quantity</label>
-                        <input  wire:model='scan.qty' class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        <input  wire:model='scan.qty' class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                        @error('scan.qty') 
+                          <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror 
                         </div>
                         <div class="flex justify-between">   
                          <button wire:click="clear" class="text-white bg-orange-400 hover:bg-orange-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ">clear</button>
