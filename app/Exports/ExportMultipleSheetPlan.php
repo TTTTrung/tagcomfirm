@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Part;
+use App\Models\PartImage;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithDrawings;
@@ -302,6 +303,40 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $barcodeDrawing->setWidth(245);
                     $barcodeDrawing->setHeight(50);
                     $barcodeDrawing->setWorksheet($sheet);
+                    
+                    $partImagePath = PartImage::where('img_part', $partname->trupart)->pluck('img_path')->first();
+                    $fullImagePath = $partImagePath ? storage_path('app/public/' . $partImagePath) : null;
+
+                    $setImage = new Drawing();
+                    $setImage->setName($partname->trupart);
+                    $setImage->setDescription($partname->trupart);
+
+                    if ($fullImagePath) {
+                        list($originalWidth, $originalHeight) = getimagesize($fullImagePath);
+
+    // Desired new dimensions
+                    $desiredWidth = 400;  // Set the desired width
+                    $desiredHeight = 80; // Set the desired height
+
+                    // Calculate aspect ratio
+                    $aspectRatio = $originalWidth / $originalHeight;
+
+                    // Adjust the dimensions to maintain the aspect ratio
+                    if ($desiredWidth / $desiredHeight > $aspectRatio) {
+                        $newWidth = $desiredHeight * $aspectRatio;
+                        $newHeight = $desiredHeight;
+                    } else {
+                        $newWidth = $desiredWidth;
+                        $newHeight = $desiredWidth / $aspectRatio;
+                    }
+                        $setImage->setPath($fullImagePath) ;
+                        $setImage->setCoordinates('E'.($count+5));
+                        $setImage->setWidth($newWidth);
+                        $setImage->setHeight($newHeight);
+                        $setImage->setWorksheet($sheet);
+                    }
+
+                    
                     // $sheet->setCellValue("A".($count + 9),"    *{$tt->quantity}*    ");
                     //  $sheet->getStyle("A".($count+9))->getFont()->setName('IDAutomationHC39M Free Version')->setSize(11);
                     // $sheet->getStyle("A".($count+9))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);

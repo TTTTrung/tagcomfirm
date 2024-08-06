@@ -39,6 +39,7 @@ Route::get('/dashboard',fn()=> to_route('landing'));
 Route::middleware(['auth',RoleMiddleware::class.':superAdmin|plAdmin|plSuperAdmin'])->group(function(){
     Route::get('/plan',[PlancreateController::class, 'index'])->name('plan');
     Route::get('/part',[PartController::class, 'index'])->name('part');
+    Route::view('/image','adminpl.imagepart')->name('partImage');
 });
 Route::middleware(['auth',RoleMiddleware::class.':superAdmin|plAdmin|plSuperAdmin|commoner|scanner|unlocker'])->group(function(){
     Route::get('/listplan',[ApprovedplanController::class, 'index'])->name('listplan');

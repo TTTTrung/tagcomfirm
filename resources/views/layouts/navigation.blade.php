@@ -51,6 +51,13 @@
                         {{ __('History') }}
                     </x-nav-link>
                 </div>
+                 @role(['plAdmin','plSuperAdmin','superAdmin'])
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('partImage')" :active="request()->routeIs('partImage')">
+                        {{ __('AddImage') }}
+                    </x-nav-link>
+                </div>
+                @endrole
                 @role(['superAdmin'])
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('createuser')" :active="request()->routeIs('createuser')">
