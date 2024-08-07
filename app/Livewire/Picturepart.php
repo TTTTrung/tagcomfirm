@@ -6,10 +6,13 @@ use App\Models\PartImage;
 use Intervention\Image\ImageManager;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class Picturepart extends Component
 {
     use WithFileUploads;
+    use WithPagination;
+    public $searchPart;
     public $part;
     public $imgPath;
     public $showCreateImage = false;
@@ -91,7 +94,9 @@ class Picturepart extends Component
 
     public function render()
     {
-        $imgs = PartImage::get();
+        $imgs = PartImage::when($this->searchPart , function($query){
+            $query->where('img_part','like','%'.$this->searchPart.'%');
+        })->paginate(10);
         return view('livewire.picturepart',compact('imgs'));
     }
 }
