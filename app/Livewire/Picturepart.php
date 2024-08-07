@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\PartImage;
+use Illuminate\Validation\Rule;
 use Intervention\Image\ImageManager;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -20,7 +21,7 @@ class Picturepart extends Component
     public $showEditImage = false;
     public function createImage(){
         $this->validate([
-            'part' => ['required'],
+            'part' => ['required','unique:part_image,img_part'],
             'imgPath'=> ['required','image']
         ]);
 
@@ -63,7 +64,7 @@ class Picturepart extends Component
     }
     public function editImage(){
         $this->validate([
-            'part' => ['required'],
+            'part' => ['required', Rule::unique('part_image', 'img_part')->ignore($this->id)],
             'imgPath'=> ['nullable','image']
         ]);
 
