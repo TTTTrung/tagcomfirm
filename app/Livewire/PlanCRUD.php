@@ -141,9 +141,8 @@ class PlanCRUD extends Component
             $index = explode('.', $attribute)[1];
             $customer = $this->itemDetails[$index]['customer'];
             $outpart = $this->itemDetails[$index]['outpart'];
-
             // Check if the combination of customer and outpart exists in the parts table
-            if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
+            if (!Part::where('customer', $customer)->where('outpart', trim($outpart))->exists()) {
                 $fail("The outpart '$outpart' does not exist for customer '$customer'.");
             }
         }],
@@ -280,7 +279,7 @@ class PlanCRUD extends Component
                     $outpart = $this->itemDetails[$index]['outpart'];
         
                     // Check if the combination of customer and outpart exists in the parts table
-                    if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
+                    if (!Part::where('customer', $customer)->where('outpart', trim($outpart))->exists()) {
                         $fail("The outpart '$outpart' does not exist for customer '$customer'.");
                     }
                 }
@@ -477,11 +476,6 @@ class PlanCRUD extends Component
     
     public function editPlan()
     {
-        // $this->duplicateInput = false;
-        // if (count(array_column($this->editItemDetails, 'issue')) !== count(array_unique(array_column($this->editItemDetails, 'issue')))) {
-        //     $this->duplicateInput = true;
-        // } 
-
         foreach($this->editItemDetails as $index  => $item)
               
             $this->validate([
@@ -489,15 +483,6 @@ class PlanCRUD extends Component
                 'eCar' => 'required|in:4W,6W,Trailer,Staion,Milk run',
                 "editItemDetails.$index.customer" => ["required",Rule::exists('parts','customer')],
                 "editItemDetails.$index.issue" => ['required',
-                // function ($attribute, $value,$fail){
-                //     $index = explode('.', $attribute)[1];
-                //     $customer = $this->editItemDetails[$index]['customer'];
-                //     $issue = $this->editItemDetails[$index]['issue'];
-
-                //     if(Listitem::where('customer', $customer)->where('issue', $issue)->where('id', '!=', $this->editItemDetails[$index]['id'])->exists()){
-                //         $fail("The issue is duplicate");
-                //     }
-                // }
                 ],
                 "editItemDetails.$index.po" => 'required',
                 "editItemDetails.$index.outpart" => ['required',
