@@ -574,7 +574,6 @@ class PlanCRUD extends Component
                 Listitem::create([
                     'plandue_id' => $this->editId,
                     'created_by' => auth()->id(),
-                    
                     'customer' => $createInUpdate['customer'],
                     'issue' => $createInUpdate['issue'],
                     'po' => $createInUpdate['po'],
@@ -642,8 +641,6 @@ class PlanCRUD extends Component
     }
 
     
-
-
 
     public function render()
     {    

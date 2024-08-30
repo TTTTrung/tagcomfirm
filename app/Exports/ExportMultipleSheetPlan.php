@@ -115,8 +115,8 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->setCellValue("G{$currentRow}",$t->po);
                     $sheet->setCellValue("H{$currentRow}",$t->pr);
                     $sheet->setCellValue("I{$currentRow}",'');
-                    $sheet->setCellValue("J{$currentRow}",$t->quantity * $weight->weight);
-                    $sheet->setCellValue("K{$currentRow}",$weight->pl_size);
+                    $sheet->setCellValue("J{$currentRow}",$t->quantity * $weight->weight ?? 0);
+                    $sheet->setCellValue("K{$currentRow}",$weight->pl_size ?? null);
                     $sheet->setCellValue("L{$currentRow}",'');
                     $sheet->setCellValue("M{$currentRow}",$t->body);
                     $sheet->setCellValue("N{$currentRow}",$t->ship_to);
@@ -144,7 +144,6 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $event->sheet->getPageMargins()->setBottom(0.5);
                     $event->sheet->getPageMargins()->setLeft(0.5);
                     $event->sheet->getPageMargins()->setRight(0.5);
-                    $event->sheet->getDelegate()->getHeaderFooter()->setOddFooter('PLD-FM-005 Rev.00 26/6/24');
                  },
                     ];
             }
