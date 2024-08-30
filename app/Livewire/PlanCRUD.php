@@ -279,7 +279,7 @@ class PlanCRUD extends Component
                     $outpart = $this->itemDetails[$index]['outpart'];
         
                     // Check if the combination of customer and outpart exists in the parts table
-                    if (!Part::where('customer', $customer)->where('outpart', trim($outpart))->exists()) {
+                    if (!Part::where('customer', trim($customer))->where('outpart', trim($outpart))->exists()) {
                         $fail("The outpart '$outpart' does not exist for customer '$customer'.");
                     }
                 }
@@ -492,7 +492,7 @@ class PlanCRUD extends Component
                     $outpart = $this->editItemDetails[$index]['outpart'];
             
                         // Check if the combination of customer and outpart exists in the parts table
-                    if (!Part::where('customer', $customer)->where('outpart', $outpart)->exists()) {
+                    if (!Part::where('customer', trim($customer))->where('outpart', trim($outpart))->exists()) {
                         $fail("The outpart '$outpart' does not exist for customer '$customer'.");
                     }
                 }
