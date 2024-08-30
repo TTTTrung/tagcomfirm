@@ -487,13 +487,13 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     }
                 }
                 $sheet->setCellValue("A{$currentrow}",$index + 1);
-                $sheet->setCellValue("B{$currentrow}",$type->type);
+                $sheet->setCellValue("B{$currentrow}",$type->type ?? null);
                 $sheet->setCellValue("C{$currentrow}",$outpart->outpart);
-                $sheet->setCellValue("D{$currentrow}",$type->partname);
-                $sheet->setCellValue("E{$currentrow}",$is_po->issue);
-                $sheet->setCellValue("F{$currentrow}",$outpart->po);
-                $sheet->setCellValue("G{$currentrow}",$outpart->pr);
-                $sheet->setCellValue("H{$currentrow}",$outpart->total_quantity);
+                $sheet->setCellValue("D{$currentrow}",$type->partname ?? null);
+                $sheet->setCellValue("E{$currentrow}",$is_po->issue ?? null);
+                $sheet->setCellValue("F{$currentrow}",$outpart->po ?? null);
+                $sheet->setCellValue("G{$currentrow}",$outpart->pr ?? null);
+                $sheet->setCellValue("H{$currentrow}",$outpart->total_quantity ?? null);
                 $sheet->setCellValue("I{$currentrow}",$body ?? null);
                 $sheet->setCellValue("J{$currentrow}",$type->snp ?? null);
                 $sheet->setCellValue("K{$currentrow}",$type->weight ?? null);
