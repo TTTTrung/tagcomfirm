@@ -304,7 +304,7 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $barcodeDrawing->setHeight(50);
                     $barcodeDrawing->setWorksheet($sheet);
                     
-                    $partImagePath = PartImage::where('img_part', $partname->trupart)->pluck('img_path')->first();
+                    $partImagePath = PartImage::where('img_part', $partname->trupart)->pluck('img_path')->first() ?? null;
                     $fullImagePath = $partImagePath ? storage_path('app/public/' . $partImagePath) : null;
 
                     if ($fullImagePath && file_exists($fullImagePath)) {
