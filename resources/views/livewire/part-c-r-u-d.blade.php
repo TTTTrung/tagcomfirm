@@ -62,6 +62,9 @@
                                     W*L*H
                                 </th>
                                 <th scope="col" class="px-6 py-3">
+                                    Pallet Name
+                                </th>
+                                <th scope="col" class="px-6 py-3">
                                     Order type
                                 </th>
                                 <th scope="col" class="px-6 py-3">
@@ -114,6 +117,9 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     {{$part->pl_size }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->pallet_name}}
                                 </td>
                                 <td class="px-6 py-4">
                                     {{ $part->order_type }}
@@ -223,6 +229,15 @@
                         <label for="wlh" class="block mb-2 text-sm font-medium text-gray-900">W*L*H</label>
                         <input id="wlh" wire:model="wlh" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
                         @error('wlh') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
+                        <label for="pName" class="block mb-2 text-sm font-medium text-gray-900">
+                            Pallet Name
+                        </label>
+                        <input id="pName" wire:model="pName" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('pName') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
                     </div>
@@ -351,6 +366,15 @@
                         <label for="ewlh" class="block mb-2 text-sm font-medium text-gray-900">W*L*H</label>
                         <input id="ewlh" wire:model="ewlh" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
                         @error('ewlh') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                      <div class="mb-5  mx-10">
+                        <label for="epName" class="block mb-2 text-sm font-medium text-gray-900">
+                            Pallet Name
+                        </label>
+                        <input id="epName" wire:model="epName" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('epName') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
                     </div>

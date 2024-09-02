@@ -83,10 +83,10 @@
                             @endforeach 
                         </tbody>
                     </table>
-                        <div class="py-2 px-2">
-                            {{ $historys->onEachSide(3)->links() }}
-                        </div>                         
                     </div> 
+                      <div class="py-2 px-2">
+                            {{ $historys->onEachSide(3)->links() }}
+                       </div>  
                 </div>
             </div>
         </div>

@@ -29,7 +29,9 @@ class PartCRUD extends Component
     public $salerep;
     public $pricelist;
     public $bill_to;
+    public $pName;
 
+    public $epName;
     public $evendor;
     public $etypee;
     public $epartname;
@@ -54,7 +56,7 @@ class PartCRUD extends Component
     public function hideCreateModal()
     {   
         $this->showCreateModal = false;
-        $this->reset(['typee','partname','outpart','trupart','snp','weight','customer','wlh','ordertype','salerep','pricelist','bill_to']);
+        $this->reset(['typee','partname','outpart','trupart','snp','weight','customer','wlh','ordertype','salerep','pricelist','bill_to','pName']);
         $this->resetValidation();
     }
 
@@ -125,6 +127,7 @@ class PartCRUD extends Component
             'sale_reps' => $this->salerep,
             'price_list'=>$this->pricelist,
             'bill_to'=>$this->bill_to,
+            'pallet_name' => $this->pName,
             'created_by' => auth()->id()
        ]);
 
@@ -141,9 +144,10 @@ class PartCRUD extends Component
         $this->epartname = $this->selectedPartData['partname']?? null;
         $this->eoutpart = $this->selectedPartData['outpart']?? null;
         $this->etrupart = $this->selectedPartData['trupart']?? null;
-        $this->esnp = $this->selectedPartData['snp']?? null;
-        $this->eweight = $this->selectedPartData['weight']?? null;
-        $this->ewlh = $this->selectedPartData['pl_size']?? null;
+        $this->esnp = $this->selectedPartData['snp'] ?? null;
+        $this->eweight = $this->selectedPartData['weight'] ?? null;
+        $this->ewlh = $this->selectedPartData['pl_size'] ?? null;
+        $this->epName = $this->selectedPartData['pallet_name'] ?? null;
         $this->esalerep = $this->selectedPartData['sale_reps']?? null;
         $this->eordertype = $this->selectedPartData['order_type']?? null;
         $this->epricelist = $this->selectedPartData['price_list']?? null;
@@ -226,6 +230,7 @@ class PartCRUD extends Component
             'pl_size' => $this->ewlh,
             'order_type' => $this->eordertype,
             'sale_reps' => $this->esalerep,
+            'pallet_name' => $this->epName,
             'price_list'=>$this->epricelist,
             'bill_to'=>$this->ebill_to,
             'updated_by' => auth()->id()
