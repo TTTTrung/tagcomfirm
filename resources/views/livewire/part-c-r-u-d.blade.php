@@ -31,10 +31,11 @@
                         @endrole
                         </div>
                     </div>
-                    <table class="m-6 w-full text-sm text-left rtl:text-right text-gray-500 ">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">
+                    <div @click.stop class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                            <tr>
+                                                 <th scope="col" class="px-6 py-3">
                                     No.
                                 </th>
                                 <th scope="col" class="px-6 py-3">
@@ -76,21 +77,15 @@
                                 <th scope="col" class="px-6 py-3">
                                     Bill to
                                 </th>
-                                {{-- <th scope="col" class="px-6 py-3">
-                                    Created by
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Updated by
-                                </th> --}}
                                 <th scope="col" class="px-6 py-3">
                                     Action
-                                </th>
+                                </th> 
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($parts as $part )
-                            <tr class="bg-white border-b hover:bg-gray-50">
-                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                                <tr class="bg-white border-b hover:bg-gray-50">
+                                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
                                     {{ $loop->iteration }}
                                 </th>
                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -144,13 +139,126 @@
                                     <button wire:click="openEditModal({{ $part->id }})"  class="font-medium text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-red-300 px-2 py-0.5">Edit</button>
                                     @else
                                     You cant edit.
-                                    {{-- <button  class="font-medium text-white rounded-lg bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 px-2 py-0.5">Delete</button> --}}
+                                    @endrole
+                                </td>
+                                </tr>   
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div> 
+                    {{-- <table class="m-6 w-full text-sm text-left rtl:text-right text-gray-500 ">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">
+                                    No.
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Customer Id.
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Type.
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Part name
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Outside part
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Thairung part 
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    SNP
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Weight
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    W*L*H
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Pallet Name
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Order type
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Sale person
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Price list
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Bill to
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($parts as $part )
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                                    {{ $loop->iteration }}
+                                </th>
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                    {{ $part->customer}}
+                                </th>
+                                
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                    {{ $part->type}}
+                                </th>
+                                <td class="px-6 py-4">
+                                    {{ $part->partname }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ $part->outpart }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ $part->trupart }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->snp }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->weight }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->pl_size }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->pallet_name}}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ $part->order_type }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->sale_reps }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->price_list }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$part->bill_to }}
+                                </td> --}}
+                                {{-- <td class="px-6 py-4">
+                                    {{ optional($part->createdBy)->name }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ optional($part->updatedBy)->name }}
+                                </td> --}}
+                                {{-- <td class="px-6 py-4">
+                                    @role(['plSuperAdmin','superAdmin'])
+                                    <button wire:click="openEditModal({{ $part->id }})"  class="font-medium text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-red-300 px-2 py-0.5">Edit</button>
+                                    @else
+                                    You cant edit.
                                     @endrole
                                 </td>
                             </tr>   
                             @endforeach 
                         </tbody>
-                    </table>
+                    </table> --}}
                     <div class="py-2 px-2">
                         {{ $parts->onEachSide(3)->links() }}
                     </div>
