@@ -395,7 +395,7 @@ class PlanCRUD extends Component
                     'prize'=>  $item['quantity'] * ($price[0]->operand ?? 0) ?? null,
                     'quantity' => $item['quantity'],
                     'body' => $item['body'],
-                    'ship_to' => $item['ship_to'],
+                    'ship_to' => trim($item['ship_to']) === "" ? null : trim($item['ship_to']) ,
                 ]);
             }
             $this->reset(['itemDetails','duedate','car']);
@@ -548,7 +548,7 @@ class PlanCRUD extends Component
                 'quantity'=>$updateItem['quantity'],
                 'prize'=> $updateItem['prize'],
                 'body' => $updateItem['body'],
-                'ship_to' => $updateItem['ship_to'],
+                'ship_to' => trim($updateItem['ship_to']) === "" ? null : trim($updateItem['ship_to']) ,
                 'updated_by' => auth()->id(),
                 ]);
             }
@@ -562,9 +562,11 @@ class PlanCRUD extends Component
                     'customer' => $createInUpdate['customer'],
                     'issue' => $createInUpdate['issue'],
                     'po' => $createInUpdate['po'],
+                    'pr' => $createInUpdate['pr'],
                     'outpart' => $createInUpdate['outpart'],
                     'quantity' => $createInUpdate['quantity'],
                     'body' =>$createInUpdate['body'],
+                    'ship_to' => trim($createInUpdate['ship_to']) === "" ? null : trim($createInUpdate['ship_to']) ,
                 ]);
             }
             $this->hideEditModal();
