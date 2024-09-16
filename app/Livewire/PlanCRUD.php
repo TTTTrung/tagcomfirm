@@ -395,7 +395,7 @@ class PlanCRUD extends Component
                     'prize'=>  $item['quantity'] * ($price[0]->operand ?? 0) ?? null,
                     'quantity' => $item['quantity'],
                     'body' => $item['body'],
-                    'ship_to' => trim($item['ship_to']) === "" ? null : trim($item['ship_to']) ,
+                    'ship_to' => ($item['ship_to'] === null || trim($item['ship_to']) === "") ? '-' : trim($item['ship_to']), 
                 ]);
             }
             $this->reset(['itemDetails','duedate','car']);
