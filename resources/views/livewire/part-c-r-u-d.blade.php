@@ -78,6 +78,9 @@
                                     Bill to
                                 </th>
                                 <th scope="col" class="px-6 py-3">
+                                    Updated by 
+                                </th>
+                                <th scope="col" class="px-6 py-3">
                                     Action
                                 </th> 
                             </tr>
@@ -127,6 +130,9 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     {{$part->bill_to }}
+                                </td>
+                                 <td class="px-6 py-4">
+                                    {{$part->updatedBy->name ?? null}}
                                 </td>
                                 {{-- <td class="px-6 py-4">
                                     {{ optional($part->createdBy)->name }}
@@ -340,6 +346,15 @@
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
                     </div>
+                      <div class="mb-5  mx-10">
+                        <label for="pWeight" class="block mb-2 text-sm font-medium text-gray-900">
+                            Pallet Weight 
+                        </label>
+                        <input id="pWeigth" wire:model="pWeight" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('pWeight') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
                     <div class="mb-5  mx-10">
                         <label for="pName" class="block mb-2 text-sm font-medium text-gray-900">
                             Pallet Name
@@ -477,7 +492,16 @@
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror        
                     </div>
-                      <div class="mb-5  mx-10">
+                    <div class="mb-5  mx-10">
+                        <label for="epWeight" class="block mb-2 text-sm font-medium text-gray-900">
+                            Pallet  Weight 
+                        </label>
+                        <input id="epWeight" wire:model="epWeight" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+                        @error('epWeight') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror        
+                    </div>
+                    <div class="mb-5  mx-10">
                         <label for="epName" class="block mb-2 text-sm font-medium text-gray-900">
                             Pallet Name
                         </label>

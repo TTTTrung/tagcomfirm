@@ -17,10 +17,11 @@ class ListitemImport implements ToCollection
                 'issue' => $rows[1],
                 'po' => $rows[2],
                 'pr' => $rows[3],
-                'outpart' => $rows[3],
-                'quantity' => $rows[4],
-                'body' => $rows[5],
-                'ship_to' =>$rows[6]
+                'outpart' => $rows[4],
+                'quantity' => $rows[5],
+                'body' => $rows[6],
+                'ship_to' =>$rows[7],
+                'remark' =>$rows[8]
            ];        
     }
 }

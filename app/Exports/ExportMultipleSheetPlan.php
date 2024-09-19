@@ -117,10 +117,10 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                     $sheet->setCellValue("H{$currentRow}",$t->pr);
                     $sheet->setCellValue("I{$currentRow}",'');
                     $sheet->setCellValue("J{$currentRow}",
-                        $t->quantity * ($weight->weight ?? 0));
+                        ($t->quantity * ($weight->weight ?? 0)+ ($weight->pallet_weight ?? 0) ));
                     $sheet->setCellValue("K{$currentRow}",$weight->pl_size ?? null);
                     $sheet->setCellValue("LK{$currentRow}",$weight->pallet_name ?? null);
-                    $sheet->setCellValue("M{$currentRow}",'');
+                    $sheet->setCellValue("M{$currentRow}",$t->remark ?? null);
                     $sheet->setCellValue("N{$currentRow}",$t->body);
                     $sheet->setCellValue("O{$currentRow}",$t->ship_to);
 

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Listitem extends Model
 {
     use HasFactory;
-    protected $fillable = ['created_by','updated_by','duedate','issue','outpart','quantity','plandue_id','po','body','customer','ship_to','prize','pr','flag'];
+    protected $fillable = ['created_by','updated_by','duedate','issue','outpart','quantity','plandue_id','po','body','customer','ship_to','prize','pr','flag','remark'];
 
     public function plandue():BelongsTo
     {

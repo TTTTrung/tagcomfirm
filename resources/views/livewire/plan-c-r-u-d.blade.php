@@ -100,6 +100,9 @@
                                                 <th scope="col" class="px-6 py-3">
                                                     Ship to 
                                                 </th>
+                                                <th scope="col" class="px-6 py-3">
+                                                    Remark 
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -136,82 +139,14 @@
                                                     <td class="px-6 py-4">
                                                         {{ $listitem->ship_to }}
                                                     </td>
+                                                     <td class="px-6 py-4">
+                                                        {{ $listitem->remark }}
+                                                    </td>
                                                 </tr>   
                                             @endforeach
                                         </tbody>
                                     </table>
                                     </div> 
-                                    {{-- <table   @click.stop class="m-6 w-full  text-sm text-left rtl:text-right text-gray-500 ">
-                                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                            <tr>
-                                                <th scope="col" class="px-6 py-3">
-                                                    No.
-                                                </th>
-                                                <th scope="col" class="px-6 py-3">
-                                                    Due date
-                                                </th>
-                                                <th scope="col" class="px-6 py-3">
-                                                    Issue/serial/lot/line
-                                                </th>
-                                                <th scope="col" class="px-6 py-3">
-                                                    PO.
-                                                </th>
-                                                <th scope="col" class="px-6 py-3">
-                                                    PR.
-                                                </th>
-                                                <th scope="col" class="px-6 py-3">
-                                                    Outside part
-                                                </th>
-                                                <th scope="col" class="px-6 py-3">
-                                                    Quantity 
-                                                </th> 
-                                                <th scope="col" class="px-6 py-3">
-                                                    Price 
-                                                </th> 
-                                                <th scope="col" class="px-6 py-3">
-                                                    Body
-                                                </th>
-                                                <th scope="col" class="px-6 py-3">
-                                                    Ship To
-                                                </th>                                             
-                                            </tr>
-                                        </thead>
-                                        @foreach ($pland->listitems as $listitem)
-                                            <tr class="bg-white border-b hover:bg-gray-50">
-                                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
-                                                    {{ $loop->iteration }}
-                                                </th>
-                                                
-                                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                                    {{ $pland->duedate }}
-                                                </th>
-                                                <td class="px-6 py-4">
-                                                    {{ $listitem->issue }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{ $listitem->po }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{ $listitem->pr }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{ $listitem->outpart }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{$listitem->quantity }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{$listitem->prize }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{ $listitem->body }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    {{ $listitem->ship_to }}
-                                                </td>
-                                            </tr>   
-                                        @endforeach
-                                    </table> --}}
                                 </div>
                                 {{-- End Accordion content --}}
                             </div>    
@@ -292,7 +227,7 @@
                             <th scope="col" class="px-6 py-3">Quantity</th>
                             <th scope="col" class="px-6 py-3">Body</th>
                             <th scope="col" class="px-6 py-3">Ship To</th>
-                            
+                            <th scope="col" class="px-6 py-3">Remark</th>
                             <th scope="col" class="px-6 py-3">Action</th>
 
                         </tr>
@@ -364,8 +299,11 @@
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="itemDetails.{{ $rowIndex }}.body" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="itemDetails.{{ $rowIndex }}.ship_to" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
+                                    </td>
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="itemDetails.{{ $rowIndex }}.remark" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
                                     
                                 
@@ -516,6 +454,7 @@
                             <th scope="col" class="px-6 py-3">Price</th>
                             <th scope="col" class="px-6 py-3">Body</th>
                             <th scope="col" class="px-6 py-3">Ship To</th>
+                            <th scope="col" class="px-6 py-3">Remark</th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
@@ -566,6 +505,9 @@
                                 @error('editItemDetails.' . $rowIndex . '.ship_to') 
                                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                                 @enderror 
+                                @error('editItemDetails.' . $rowIndex . '.remark') 
+                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                @enderror 
                             </td>
                         </tr>
                             <tr class="bg-white border-b hover:bg-gray-50">                                
@@ -596,6 +538,9 @@
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="editItemDetails.{{ $rowIndex }}.ship_to" type="text" class="w-full p-2 border border-gray-300 rounded text-xs"  />     
+                                    </td>                                  
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="editItemDetails.{{ $rowIndex }}.remark" type="text" class="w-full p-2 border border-gray-300 rounded text-xs"  />     
                                     </td>                                  
                                 <td class="px-6 py-4">
                                     <button type="button" wire:click="editRemove({{ $rowIndex }})" class="text-red-500 focus:outline-none">

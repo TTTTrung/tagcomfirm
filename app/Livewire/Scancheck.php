@@ -105,22 +105,22 @@ class Scancheck extends Component
     }
     }
     public function nissan($id,$scan){
-        $cleanedIssueno = substr($scan['issue'], 2,-2);
-        $cleanedpartout = substr($scan['outside'], 1);
+        $cleanedIssueno = substr($scan['issue'] ,2);
+        $cleanedpartout = substr($scan['outside'] ,1);
         $cleanedQuality = (int) preg_replace('/[^\d]/', '', $scan['qty']); 
 
         $check = Plandue::where('plan_id', $id)->with('listitems')->first();
-
+        // dd($cleanedIssueno);
         $pallet = null; 
-
         if ($check) {
-            $pallet = $check->listitems()
+            $pallet = $check->listitems
             ->where('outpart', $cleanedpartout ?? null)
             ->where('quantity', $cleanedQuality)
             ->where('issue', $cleanedIssueno)
             ->whereNull('flag')
             ->first();
         }
+        dd($pallet);
 
         if(Part::where('customer', '20146')
         ->where('outpart', $cleanedpartout ?? null)

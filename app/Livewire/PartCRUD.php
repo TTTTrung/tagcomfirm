@@ -30,6 +30,7 @@ class PartCRUD extends Component
     public $pricelist;
     public $bill_to;
     public $pName;
+    public $pWeight;
 
     public $epName;
     public $evendor;
@@ -44,6 +45,7 @@ class PartCRUD extends Component
     public $esalerep;
     public $epricelist;
     public $ebill_to;
+    public $epWeight;
 
     public $search;
     public $company = "";
@@ -78,6 +80,7 @@ class PartCRUD extends Component
         'wlh' => 'required',
         'ordertype' => 'required',
         'salerep'=> 'required',
+        'pallet_weight' => 'numeric|gte:0',
         'pricelist'=>'required',
         'bill_to'=> ['required',
             function($attribute, $value, $fail){
@@ -127,6 +130,7 @@ class PartCRUD extends Component
             'sale_reps' => $this->salerep,
             'price_list'=>$this->pricelist,
             'bill_to'=>$this->bill_to,
+            'pallet_weight'=>($this->pWeight === null || trim($this->pWeight) === "") ? '0' : trim($this->pWeight),
             'pallet_name' => $this->pName,
             'created_by' => auth()->id()
        ]);
@@ -152,6 +156,7 @@ class PartCRUD extends Component
         $this->eordertype = $this->selectedPartData['order_type']?? null;
         $this->epricelist = $this->selectedPartData['price_list']?? null;
         $this->ebill_to = $this->selectedPartData['bill_to']?? null;
+        $this->epWeight = $this->selectedPartData['pallet_weight'] ?? null;
     
         $this->showEditModal = true;
         }
@@ -161,7 +166,7 @@ class PartCRUD extends Component
     {
         $this->showEditModal = false;
         $this->resetValidation();
-        $this->reset(['etypee','epartname','eoutpart','etrupart','esnp','eweight','evendor','ewlh','eordertype','esalerep','epricelist','ebill_to']);
+        $this->reset(['etypee','epartname','eoutpart','etrupart','esnp','eweight','evendor','ewlh','eordertype','esalerep','epricelist','ebill_to','epWeight']);
     }
 
     public function editPart()
@@ -180,6 +185,7 @@ class PartCRUD extends Component
         'eweight' => 'required|numeric|gte:0',
         'ewlh' => 'required',
         'eordertype' => 'required',
+        'epWeight' => 'gte:0',
         'esalerep'=> 'required',
         'epricelist'=>'required',
         'ebill_to'=> ['required',
@@ -230,6 +236,7 @@ class PartCRUD extends Component
             'pl_size' => $this->ewlh,
             'order_type' => $this->eordertype,
             'sale_reps' => $this->esalerep,
+            'pallet_weight' => $this->epWeight,
             'pallet_name' => $this->epName,
             'price_list'=>$this->epricelist,
             'bill_to'=>$this->ebill_to,
