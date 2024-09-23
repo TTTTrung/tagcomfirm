@@ -80,7 +80,7 @@ class PartCRUD extends Component
         'wlh' => 'required',
         'ordertype' => 'required',
         'salerep'=> 'required',
-        'pallet_weight' => 'numeric|gte:0',
+        'pWeight' => 'numeric|gte:0',
         'pricelist'=>'required',
         'bill_to'=> ['required',
             function($attribute, $value, $fail){
