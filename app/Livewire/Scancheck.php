@@ -110,13 +110,12 @@ class Scancheck extends Component
         $cleanedQuality = (int) preg_replace('/[^\d]/', '', $scan['qty']); 
 
         $check = Plandue::where('plan_id', $id)->with('listitems')->first();
-        // dd($cleanedpartout);
         $pallet = null; 
         if ($check) {
             $pallet = $check->listitems
-            ->where('outpart', $cleanedpartout ?? null)
-            ->where('quantity', $cleanedQuality)
-            ->where('issue',$cleanedIssueno)
+            ->where('outpart', trim($cleanedpartout))
+            ->where('quantity', trim($cleanedQuality))
+            ->where('issue',trim($cleanedIssueno))
             ->whereNull('flag')
             ->first(); 
         }
