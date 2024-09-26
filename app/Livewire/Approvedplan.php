@@ -125,10 +125,10 @@ class Approvedplan extends Component
         $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
         $checkExist = Opland::where('legacy_so_num','LIKE',$oracle->plan_id . '%')->first();
         }catch(\Exception $e){
-            session()->flash('error', 'can not get plan id'); 
+            return session()->flash('error', 'can not get plan id'); 
         }
         if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
-            session()->flash('error', 'Not enough data for oracle');
+            return session()->flash('error', 'Not enough data for oracle');
         }
         else{
             if(empty($checkExist)){
@@ -138,7 +138,7 @@ class Approvedplan extends Component
                 $part = Part::where('customer',$oracle->listitems->first()->customer)
                 ->where('outpart',$items->first()->outpart)->first(); 
                 if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
-                    session()->flash('error', 'Not enough data for oracle');
+                    return session()->flash('error', 'Not enough data for oracle');
                 }
             $pland = Opland::create([
                 'legacy_so_num' => ($oracle->plan_id)." ".($key),
@@ -170,11 +170,11 @@ class Approvedplan extends Component
             session()->flash('success', ' Commit data to oracle succesfuly'); 
             }catch(\Exception $e){
                 DB::rollBack();
-                session()->flash('error', 'can not insert data into oracle pls try again later.'); 
+                return session()->flash('error', 'can not insert data into oracle pls try again later.'); 
             }
         }
             else{
-                session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
+                return session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
             }
         }
     }
@@ -211,13 +211,13 @@ class Approvedplan extends Component
             return $item->sale_reps;
         }); 
         $part = Part::where('customer',$oracle->listitems->first()->customer)->where('outpart',$oracle->listitems->first()->outpart)->first();
-        $checkExist = Opland::where('legacy_so_num',$oracle->plan_id)->first();
+        $checkExist = Opland::where('legacy_so_num','LIKE',$oracle->plan_id . '%')->first();
         } catch(\Exception $e){
-            session()->flash('error', 'can not get plan id'); 
+            return session()->flash('error', 'can not get plan id'); 
         }
         
         if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
-            session()->flash('error', 'Not enough data for oracle');
+            return session()->flash('error', 'Not enough data for oracle');
         }
         else{
             if(empty($checkExist)){
@@ -235,7 +235,7 @@ class Approvedplan extends Component
                     'salesperson'=>$part->sale_reps,
                     'warehouse'=>'TRU', 
                 ]);
-                 foreach ($items as $index=>$item) {
+                foreach ($items as $index=>$item) {
                 $pland->olist()->create([
                     'item_code' => Part::where('customer',$item->customer)->where('outpart',$item->outpart)->pluck('trupart')
                     ->first(),
@@ -250,15 +250,15 @@ class Approvedplan extends Component
                 }
                 }
                 DB::commit();
-                session()->flash('success', ' Commit data to oracle succesfuly');
+                return session()->flash('success', ' Commit data to oracle succesfuly');
                 
                 }catch(\Exception $e){
                     DB::rollBack();
-                    session()->flash('error', 'can not insert data into oracle pls try again later.'); 
+                    return session()->flash('error', 'can not insert data into oracle pls try again later.'); 
                 }
             }
             else{
-                session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
+               return session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
             }
         }
     }
@@ -299,10 +299,10 @@ class Approvedplan extends Component
             // dd($part->bill_to);
             $checkExist = Opland::where('legacy_so_num','LIKE',$oracle->plan_id . '%')->first();
             }catch(\Exception $e){
-                session()->flash('error', 'can not get plan id'); 
+                return session()->flash('error', 'can not get plan id'); 
             }
             if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
-                session()->flash('error', 'Not enough data for oracle');
+                return session()->flash('error', 'Not enough data for oracle');
             }
             else{
                 if(empty($checkExist)){
@@ -320,7 +320,7 @@ class Approvedplan extends Component
                             ->where('outpart',$items->first()->outpart)->first();
 
                     if (!$part->bill_to || !$part->order_type || !$part->price_list || !$part->sale_reps) {
-                        session()->flash('error', 'Not enough data for oracle');
+                      return  session()->flash('error', 'Not enough data for oracle');
                     }
                 $pland = Opland::create([
                     'legacy_so_num' => ($oracle->plan_id)." ".($key),
@@ -331,7 +331,6 @@ class Approvedplan extends Component
                     'price_list'=>$part->price_list,
                     'salesperson'=>$part->sale_reps,
                     'warehouse'=>'TRU',
-                    
                 ]);
                 $line = 1;
                 foreach ($items as $item) {
@@ -352,13 +351,13 @@ class Approvedplan extends Component
                 session()->flash('success', ' Commit data to oracle succesfuly'); 
                 }catch(\Exception $e){
                     DB::rollBack();
-                    session()->flash('error', 
+                    return session()->flash('error', 
                     'can not insert data into oracle pls try again later.'); 
                 }
             
             }
                 else{
-                    session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
+                    return session()->flash('error', '  Plan already exist in oracle. If you want to commit this in to oracle, Please delete data in oracle first.'); 
                 }
             }
     }
