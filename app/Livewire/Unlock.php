@@ -19,7 +19,11 @@ class Unlock extends Component
             'password' => ['required'],
             'description' => ['required']
         ]);
-        $user = User::where('email',$this->email)->first();
+        try{
+            $user = User::where('email',$this->email)->first();
+        }catch(\Exception $e){
+            return session()->flash('error','user or password is incorrect.'); 
+        }
         if ($user && Hash::check($this->password,$user->password) && in_array('plSuperAdmin',$user->getRoleNames()->toArray()) || in_array('superAdmin',$user->getRoleNames()->toArray())|| in_array('unlocker',$user->getRoleNames()->toArray()) )
         {
             try{ 
@@ -33,11 +37,11 @@ class Unlock extends Component
             $user->syncRoles('scanner');
             return redirect()->route('scanconfirm')->with('success','unlock user success');
          }catch(\Exception $e){
-             session()->flash('error','somthing went wrong');
+             return session()->flash('error','somthing went wrong');
          }
         }
         else{
-            session()->flash('erro','user or password incorrect');
+            return session()->flash('erro','user or password is incorrect');
         }
         
     }
