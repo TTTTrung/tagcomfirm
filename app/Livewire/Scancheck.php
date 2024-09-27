@@ -196,18 +196,19 @@ class Scancheck extends Component
             $pallet = $check->listitems
                 ->where('po',$po)
                 ->where('outpart',$part)
-                ->where('quantity',$quantity);
+                ->where('quantity',$quantity)
+                ->first();
         }
         if (Part::where('outpart', $part ?? null)
-        ->where('trupart', $scan['partT'])
+        ->where('trupart', $outSide['partT'])
         ->exists() && !is_null($pallet)) {
-            try{
+            // try{
                 $pallet->update(['flag' => true]);
                 History::create([
                     'planid' => $id,
                     'customer' => 'ISUZU',
                     'outside' => $part ,// Ensure this value exists
-                    'thpart' => $scan['partT'],
+                    'thpart' => $outSide['partT'],
                     'qty' => $quantity,
                     'status' => 'success',
                     'created_by' => auth()->id(),
@@ -215,17 +216,17 @@ class Scancheck extends Component
                 $this->reset('scan');
                 $this->resetValidation();
                 return session()->flash('success','successful scan');
-            }catch(\Exception $e){
-                return session()->flash('error','something went wrong');
-            }
+            // }catch(\Exception $e){
+            //     return session()->flash('error','something went wrong');
+            // }
         }
         else{
-            try{
+            // try{
                 History::create([
                     'planid' => $id,
                     'customer' => 'ISUZU',
                     'outside' => $part ?? null,
-                    'thpart' => $scan['partT'],
+                    'thpart' => $outSide['partT'],
                     'qty' => $quantity,
                     'status' => 'fail',
                     'created_by' => auth()->id()
@@ -235,9 +236,9 @@ class Scancheck extends Component
                     $role = Role::findOrCreate('lock');
                     $user->syncRoles($role);
                     return redirect()->route('unlock')->with('error', 'no part or part already scan');
-            }catch(\Exception $e){
-                return session()->flash('error','something went wrong');
-            }
+            // }catch(\Exception $e){
+            //     return session()->flash('error','something went wrong');
+            // }
         }
     }
     public function clear(){
