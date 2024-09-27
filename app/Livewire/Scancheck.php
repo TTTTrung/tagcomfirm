@@ -197,6 +197,7 @@ class Scancheck extends Component
                 ->where('po',$po)
                 ->where('outpart',$part)
                 ->where('quantity',$quantity)
+                 ->whereNull('flag')
                 ->first();
         }
         if (Part::where('outpart', $part ?? null)
