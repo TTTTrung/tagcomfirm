@@ -155,7 +155,6 @@ class PlanCRUD extends Component
         'duedate.date' => 'Date must be a valid date.',
         'car.required' => 'DueDate is required.',
         'itemDetails.*.customer.required' => 'Customer is required.',
-        'itemDetails.*.customer.required' => 'Customer does not exist.',        
         'itemDetails.*.outpart.required' => 'Outpart field is required.',
         'itemDetails.*.quantity.required' => 'Quantity field is required.',
         'itemDetails.*.quantity.numeric' => 'Quantity must be numeric.',
