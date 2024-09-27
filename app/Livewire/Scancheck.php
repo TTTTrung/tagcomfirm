@@ -202,7 +202,7 @@ class Scancheck extends Component
         if (Part::where('outpart', $part ?? null)
         ->where('trupart', $outSide['partT'])
         ->exists() && !is_null($pallet)) {
-            // try{
+            try{
                 $pallet->update(['flag' => true]);
                 History::create([
                     'planid' => $id,
@@ -216,12 +216,12 @@ class Scancheck extends Component
                 $this->reset('scan');
                 $this->resetValidation();
                 return session()->flash('success','successful scan');
-            // }catch(\Exception $e){
-            //     return session()->flash('error','something went wrong');
-            // }
+            }catch(\Exception $e){
+                return session()->flash('error','something went wrong');
+            }
         }
         else{
-            // try{
+            try{
                 History::create([
                     'planid' => $id,
                     'customer' => 'ISUZU',
@@ -236,9 +236,9 @@ class Scancheck extends Component
                     $role = Role::findOrCreate('lock');
                     $user->syncRoles($role);
                     return redirect()->route('unlock')->with('error', 'no part or part already scan');
-            // }catch(\Exception $e){
-            //     return session()->flash('error','something went wrong');
-            // }
+            }catch(\Exception $e){
+                return session()->flash('error','something went wrong');
+            }
         }
     }
     public function clear(){
