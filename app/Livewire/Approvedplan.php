@@ -43,8 +43,8 @@ class Approvedplan extends Component
         if (!$exportplan) {
                     return response()->json(['error' => 'Plandue not found'], 404);
                 }
-        $test = $exportplan->listitems;
-        $test2 = $exportplan->createBy;
+        $listitems = $exportplan->listitems;
+        $createBy= $exportplan->createBy;
         $sumvalue = Listitem::select('outpart', 'po','pr','customer', DB::raw('SUM(quantity) as total_quantity'),DB::raw('SUM(prize) as total_price'))
         ->where('plandue_id', $id)
         ->groupBy('outpart', 'po', 'customer','pr') // Include customer in the group by clause
@@ -52,7 +52,7 @@ class Approvedplan extends Component
         // dd($sumvalue);
         // dd(file_exists("img/J1A-F217G-00-00-80.jpg"));
         
-        return Excel::download(new ExportMultipleSheetPlan($exportplan, $test, $test2,$sumvalue),'tag.xlsx');
+        return Excel::download(new ExportMultipleSheetPlan($exportplan, $listitems, $createBy,$sumvalue),'tag.xlsx');
 
     }
 

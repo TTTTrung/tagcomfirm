@@ -19,7 +19,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use File;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\planduebase\Eloquent\Collection;
 use Milon\Barcode\DNS2D;
 
 class ExportMultipleSheetPlan implements WithMultipleSheets
@@ -27,16 +27,16 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
     /**
     * @return \Illuminate\Support\Collection
     */
-    protected $data;
-    protected $test;
-    protected $test2;
+    protected $plandue;
+    protected $listitems;
+    protected $createBy;
     protected $sumvalue;
 
-    public function __construct($data,$test,$test2,$sumvalue)
+    public function __construct($plandue,$listitems,$createBy,$sumvalue)
     {
-        $this->data = $data;
-        $this->test = $test;
-        $this->test2 = $test2;
+        $this->plandue = $plandue;
+        $this->listitems = $listitems;
+        $this->createBy = $createBy;
         $this->sumvalue = $sumvalue;
     }
 
@@ -44,16 +44,16 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
     {
         $sheets = [];
 
-        $sheets[] = new class($this->data,$this->test,$this->test2) implements WithHeadings ,WithCustomStartCell ,WithStyles,WithEvents
+        $sheets[] = new class($this->plandue,$this->listitems,$this->createBy) implements WithHeadings ,WithCustomStartCell ,WithStyles,WithEvents
         {
-            protected $data;
-            protected $test;
-            protected $test2;
-            public function __construct($data,$test,$test2)
+            protected $plandue;
+            protected $listitems;
+            protected $createBy;
+            public function __construct($plandue,$listitems,$createBy)
             {
-                $this->data = $data;
-                $this->test = $test;
-                $this->test2 = $test2;
+                $this->plandue = $plandue;
+                $this->listitems = $listitems;
+                $this->createBy = $createBy;
             }
            
             public function headings(): array
@@ -91,23 +91,23 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 
                 $sheet->setShowGridlines(false);
                 $sheet->setCellValue('A2','PlanDue ID :');
-                $sheet->setCellValue('B2',$this->data->plan_id);
+                $sheet->setCellValue('B2',$this->plandue->plan_id);
                 $sheet->setCellValue('A3','Created By :');
-                $sheet->setCellValue('B3',$this->test2->name);
+                $sheet->setCellValue('B3',$this->createBy->name);
                 $sheet->setCellValue('A4','Approved By :');
-                $sheet->setCellValue('B4',$this->test2->name);
-                $sheet->setCellValue('K2','Go with: '.($this->data->go_with));
+                $sheet->setCellValue('B4',$this->createBy->name);
+                $sheet->setCellValue('K2','Go with: '.($this->plandue->go_with));
                 $sheet->mergeCells('L2:N4');
-                $sheet->setCellValue('L2',"*{$this->data->plan_id}*");
+                $sheet->setCellValue('L2',"*{$this->plandue->plan_id}*");
                 $sheet->getStyle("L2")->getFont()->setName('IDAutomationHC39M Free Version')->setSize(9);
                 $sheet->getStyle("L2")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle("L2")->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                 $currentRow = 7;
                 
-                foreach($this->test as $t)
+                foreach($this->listitems as $t)
                 {
                     $weight = Part::where('customer',$t->customer)->where('outpart',$t->outpart)->first();
-                    $sheet->setCellValue("A{$currentRow}",$this->data->duedate);
+                    $sheet->setCellValue("A{$currentRow}",$this->plandue->duedate);
                     $sheet->setCellValue("B{$currentRow}",$weight->type ?? null);
                     $sheet->setCellValue("C{$currentRow}",$t->outpart);
                     $sheet->setCellValue("D{$currentRow}",$weight->partname ?? null);
@@ -152,17 +152,17 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
             }
             
         };
-        $sheets[] = new class($this->data,$this->test,$this->test2) implements WithCustomStartCell ,WithStyles,WithEvents
+        $sheets[] = new class($this->plandue,$this->listitems,$this->createBy) implements WithCustomStartCell ,WithStyles,WithEvents
         {
-            protected $data;
-            protected $test;
-            protected $test2;
+            protected $plandue;
+            protected $listitems;
+            protected $createBy;
 
-            public function __construct($data,$test,$test2)
+            public function __construct($plandue,$listitems,$createBy)
             {
-                $this->data = $data;
-                $this->test = $test;
-                $this->test2 = $test2;
+                $this->plandue = $plandue;
+                $this->listitems = $listitems;
+                $this->createBy = $createBy;
             }
 
             public function startCell(): string
@@ -170,44 +170,13 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 return "A1";
             }
 
-            // public function drawings()
-            // {
-                // dd(file_exists("img/J1A-F217G-00-00-80.jpg"));
-                // $drawing = new Drawing();
-                // $drawing->setName('Logo');
-                // $drawing->setDescription('This is my logo');
-                // $drawing->setPath(public_path('img/J1A-F217G-00-00-80.jpg'));
-                // $drawing->setHeight(85);
-                // $drawing->setWidth(200);
-                // $drawing->setCoordinates('E6');
-                
-                // return [$drawing];
-            //     $drawings = [];
-            //     $count = 1;
-            //     foreach ($this->test as $picture)
-            //     {
-            //         $partname = Part::where('outpart',$picture->outpart)->first();
-            //         $trupart = $partname->trupart ?? null;
-            //         $drawing = new Drawing();
-            //         $drawing->setName($trupart);
-            //         $drawing->setPath(public_path("img/J1A-F217G-00-00-80.jpg"));
-            //         $drawing->setHeight(85);
-            //         $drawing->setWidth(200);
-            //         $drawing->setCoordinates("E".($count + 5));
-            //         $count += 13;
-            //         $drawings[] = $drawing;
-            //     }
-            //     return $drawings;
-            // }
-           
-
             public function styles(Worksheet $sheet)
             {
             $count = 1; // Start with 1 if you want to start from row 1
             $sheet->getColumnDimension('A')->setWidth(12);
 
             // $sheet->setShowGridlines(false);    
-            foreach ($this->test as $tt) {
+            foreach ($this->listitems as $tt) {
 
                    
                     $sheet->getStyle("A{$count}:A" . ($count + 9))->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THICK);
@@ -243,10 +212,10 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
 
                     $sheet->setCellValue("A".($count + 3),'Customer');
                     $sheet->mergeCells("B".($count + 3).":H".($count + 3));
-                    $sheet->setCellValue("B".($count + 3), $this->data->company_name);
+                    $sheet->setCellValue("B".($count + 3), $this->plandue->company_name);
 
                     $sheet->setCellValue("A".($count + 4),'Delivery');
-                    $sheet->setCellValue("B".($count + 4),$this->data->duedate);
+                    $sheet->setCellValue("B".($count + 4),$this->plandue->duedate);
 
                     $sheet->setCellValue("A".($count + 5),'Ship to');
                     $sheet->setCellValue("B".($count + 5),$tt->ship_to);
@@ -359,18 +328,18 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
                 ];
             }
         };
-        $sheets[] = new class($this->data,$this->test,$this->test2,$this->sumvalue) implements WithHeadings,WithEvents,WithStyles,WithCustomStartCell
+        $sheets[] = new class($this->plandue,$this->listitems,$this->createBy,$this->sumvalue) implements WithHeadings,WithEvents,WithStyles,WithCustomStartCell
         {
-            protected $data;
-            protected $test;
-            protected $test2;
+            protected $plandue;
+            protected $listitems;
+            protected $createBy;
             protected $sumvalue;
 
-            public function __construct($data,$test,$test2,$sumvalue)
+            public function __construct($plandue,$listitems,$createBy,$sumvalue)
             {
-                $this->data = $data;
-                $this->test =  $test;
-                $this->test2 = $test2;
+                $this->plandue = $plandue;
+                $this->listitems =  $listitems;
+                $this->createBy = $createBy;
                 $this->sumvalue = $sumvalue;
             }
             public function startCell(): string
@@ -386,16 +355,16 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
             {
 
                 $sheet->mergeCells("B2:H3");
-                $sheet->setCellValue("B2", $this->data->company_name);
+                $sheet->setCellValue("B2", $this->plandue->company_name);
                 $sheet->getStyle("B2")->getFont()->setSize(20);
                 $sheet->mergeCells("M1:N1");
-                $sheet->setCellValue('M1',$this->test2->name);
+                $sheet->setCellValue('M1',$this->createBy->name);
                 $sheet->getStyle("M1")->getFont()->setSize(15);
                 $sheet->mergeCells("K2:N3");
-                $sheet->setCellValue('K2',"{$this->data->duedate}"."  Car: "."{$this->data->car}");
+                $sheet->setCellValue('K2',"{$this->plandue->duedate}"."  Car: "."{$this->plandue->car}");
                 $sheet->getStyle("K2")->getFont()->setSize(20);
                 $sheet->mergeCells('K4:L4');
-                $sheet->setCellValue('K4','Go with: '.($this->data->go_with));
+                $sheet->setCellValue('K4','Go with: '.($this->plandue->go_with));
                 $styleArray = [
                     'borders' => [
                         'top' => [
@@ -480,11 +449,11 @@ class ExportMultipleSheetPlan implements WithMultipleSheets
 
                 foreach ($this->sumvalue as $index => $outpart){
                 $type = Part::where("outpart",$outpart->outpart)->where("customer",$outpart->customer)->first();
-                $is_po =$this->test->Where('outpart',$outpart->outpart)->where('po',$outpart->po)->first();
+                $is_po =$this->listitems->Where('outpart',$outpart->outpart)->where('po',$outpart->po)->first();
                 // dd($is_po);
                 if(str_contains($is_po->body,"-"))
                 {
-                    $lastItem = $this->test->Where('outpart', $outpart->outpart)->last();
+                    $lastItem = $this->listitems->Where('outpart', $outpart->outpart)->last();
                     if ($lastItem) {
                         $lastBody = explode("-", $lastItem->body);
                         $firstPart = explode("-", $is_po->body)[0];
