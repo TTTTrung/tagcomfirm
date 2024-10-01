@@ -66,7 +66,7 @@ class Scancheck extends Component
             ->first();
     }
     if (Part::where('customer', '20062')
-        ->where('outpart', trim($outpart[1]) ?? null)
+        ->where('outpart', $outpart[1] ?? null)
         ->where('trupart', trim($scan['partT']))
         ->exists() && !is_null($pallet)) {
         try{
