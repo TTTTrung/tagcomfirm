@@ -47,7 +47,6 @@ class Scancheck extends Component
         $this->validate([
             'companys' => ['required'],
             'planid' => ['required'],
-            'scan.issue' => ['required_if:company,NISSAN'],
             'scan.outside' => ['required'],
             'scan.partT' => ['required'],
             'scan.qty' => ['required'],
