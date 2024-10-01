@@ -60,7 +60,7 @@ class Scancheck extends Component
 
     if ($check) {
         $pallet = $check->listitems()
-            ->where('outpart', trim($outpart[1]) ?? null)
+            ->where('outpart', $outpart[1] ?? null)
             ->where('quantity', trim($scan['qty']))
             ->whereNull('flag')
             ->first();
@@ -74,7 +74,7 @@ class Scancheck extends Component
         History::create([
             'planid' => $id,
             'customer' => '20062',
-            'outside' => trim($outpart[1]) ?? null,// Ensure this value exists
+            'outside' => $outpart[1] ?? null,// Ensure this value exists
             'thpart' => trim($scan['partT']),
             'qty' => trim($scan['qty']),
             'status' => 'success',
@@ -92,7 +92,7 @@ class Scancheck extends Component
         History::create([
             'planid' => $id,
             'customer' => '20062',
-            'outside' => trim($outpart[1]) ?? null,
+            'outside' => $outpart[1] ?? null,
             'thpart' => trim($scan['partT']),
             'qty' => trim($scan['qty']),
             'status' => 'fail',
@@ -103,9 +103,9 @@ class Scancheck extends Component
             $role = Role::findOrCreate('lock');
             $user->syncRoles($role);
             return redirect()->route('unlock')->with('error', 'no part or part already scan');
-    }catch(\Exception $e){
-        return session()->flash('error','something went wrong');
-    }
+        }catch(\Exception $e){
+            return session()->flash('error','something went wrong');
+        }
     }
     }
     public function nissan($id,$scan){
