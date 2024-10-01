@@ -14,7 +14,7 @@ use Spatie\Permission\Models\Role;
 class Scancheck extends Component
 {
     public $companys =['BKC','NISSAN','ISUZU']; 
-    public $company = null;
+    public $company = "BKC";
     public $thisCompany = "BKC";
     public $planid;
     public $scan =['issue'=> '','outside'=>'','partT'=>'','qty'=>'']; 
