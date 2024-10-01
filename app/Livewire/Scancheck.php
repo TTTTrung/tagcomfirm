@@ -44,7 +44,6 @@ class Scancheck extends Component
     }
 
     public function bkc($id,$scan){
-        dd('test1');
         $this->validate([
             'companys' => ['required'],
             'planid' => ['required'],
@@ -52,7 +51,6 @@ class Scancheck extends Component
             'scan.partT' => ['required'],
             'scan.qty' => ['required'],
        ]);
-        dd('test2');
     $outpart = explode(',', $scan['outside']);
     $outpart = explode('_', end($outpart));
 
